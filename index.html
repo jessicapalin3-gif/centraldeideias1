@@ -2217,8 +2217,12 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
             <div className="max-w-6xl mx-auto px-5 py-6 sm:py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl border-2 flex flex-col items-center justify-center font-serif leading-none" style={{borderColor:'#c9a44a', color:'#c9a44a'}}>
-                    <span className="text-xl sm:text-2xl font-semibold tracking-tight">JP</span>
+                  <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl border-2 flex flex-col items-center justify-center font-serif leading-none gap-0.5" style={{borderColor:'#c9a44a', color:'#c9a44a'}}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                      <path d="M2 21c0-3 1.85-5.36 5.08-6" />
+                    </svg>
+                    <span className="text-lg sm:text-xl font-semibold tracking-tight">JP</span>
                   </div>
                   <div>
                     <h1 className="font-serif text-3xl sm:text-4xl">Jardim de Ideias</h1>
