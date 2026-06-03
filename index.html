@@ -1,0 +1,2476 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#5d372d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Central de Ideias" />
+  <title>Central de Ideias da Jéssica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Fraunces', 'serif'],
+          },
+          colors: {
+            brand: {
+              50:'#faf6f2',100:'#f3e9df',200:'#e6d2bf',300:'#d4b394',
+              400:'#c2926b',500:'#b3784f',600:'#a56342',700:'#894e38',
+              800:'#704033',900:'#5d372d',
+            },
+            plum: {
+              50:'#f8f5fb',100:'#efe7f6',200:'#e0cfee',300:'#c9aae0',
+              400:'#ad7ecd',500:'#945bb8',600:'#7d459c',700:'#683780',
+              800:'#572f6a',900:'#4a2a59',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family:'Inter',sans-serif; }
+    .font-serif { font-family:'Fraunces',serif; }
+    ::-webkit-scrollbar { width:10px; height:10px; }
+    ::-webkit-scrollbar-thumb { background:#d4b394; border-radius:8px; }
+    ::-webkit-scrollbar-track { background:#f3e9df; }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+    /* evita o zoom automático do iOS ao focar campos no celular */
+    @media (max-width:640px) {
+      input, textarea, select { font-size:16px !important; }
+    }
+    [data-anim] { animation: fade .25s ease both; }
+    @keyframes fade { from { opacity:0; transform:translateY(6px);} to{opacity:1;transform:none;} }
+
+    /* ===== MODO ESCURO (só na tela; impressão continua clara) ===== */
+    @media screen {
+      html.dark, .dark body { background-color:#15110d; }
+      .dark body { color:#f1e8dc; }
+
+      .dark .bg-white { background-color:#211b16 !important; }
+      .dark .bg-brand-50 { background-color:#15110d; }
+      .dark .bg-brand-50\/60 { background-color:rgba(21,17,13,.6); }
+      .dark .bg-brand-50\/90 { background-color:rgba(21,17,13,.9); }
+      .dark .bg-brand-100 { background-color:#2b231c; }
+      .dark .bg-brand-100\/40 { background-color:rgba(43,35,28,.4); }
+      .dark .bg-brand-100\/70 { background-color:rgba(43,35,28,.7); }
+      .dark .bg-brand-600 { background-color:#a56342; }
+      .dark .bg-brand-800 { background-color:#9c6748; }
+      .dark .bg-brand-900 { background-color:#8a5a3e; }
+
+      .dark .text-brand-900 { color:#f1e8dc; }
+      .dark .text-brand-800 { color:#e7dccd; }
+      .dark .text-brand-700 { color:#d8cbb9; }
+      .dark .text-brand-600 { color:#bba994; }
+      .dark .text-brand-500 { color:#a4917a; }
+      .dark .text-brand-400 { color:#8a7763; }
+      .dark .text-brand-300 { color:#6f5d4c; }
+
+      .dark .border-brand-100 { border-color:#2b231c; }
+      .dark .border-brand-200 { border-color:#3a2f26; }
+      .dark .border-brand-300 { border-color:#463a2f; }
+      .dark .ring-brand-200 { --tw-ring-color:#3a2f26; }
+      .dark .ring-brand-300 { --tw-ring-color:#463a2f; }
+
+      .dark .bg-plum-50, .dark .bg-plum-50\/60 { background-color:#251a2e; }
+      .dark .bg-plum-100 { background-color:#2e2138; }
+      .dark .text-plum-800 { color:#d9c2ec; }
+      .dark .text-plum-700 { color:#c9aae0; }
+      .dark .text-plum-600 { color:#bd97d8; }
+      .dark .border-plum-100 { border-color:#3a2147; }
+      .dark .border-plum-200 { border-color:#4a2a59; }
+      .dark .ring-plum-200 { --tw-ring-color:#4a2a59; }
+
+      .dark .bg-amber-50 { background-color:#2a2212; }
+      .dark .bg-amber-100 { background-color:#3a2f14; }
+      .dark .border-amber-200 { border-color:#4a3c1a; }
+      .dark .text-amber-800 { color:#e6c878; }
+      .dark .bg-red-50 { background-color:#2c1717; }
+      .dark .bg-red-100 { background-color:#3a1d1d; }
+      .dark .border-red-200 { border-color:#5a2a2a; }
+      .dark .border-red-300 { border-color:#6a3333; }
+      .dark .text-red-600 { color:#f08a8a; }
+      .dark .text-red-700 { color:#f3a0a0; }
+      .dark .bg-emerald-100 { background-color:#16302a; }
+      .dark .text-emerald-800 { color:#7fd9b8; }
+      .dark .bg-blue-100 { background-color:#16263a; }
+      .dark .text-blue-800 { color:#86b8e6; }
+      .dark .bg-stone-100 { background-color:#2a2622; }
+      .dark .text-stone-700 { color:#cfc4b8; }
+
+      .dark ::-webkit-scrollbar-thumb { background:#463a2f; }
+      .dark ::-webkit-scrollbar-track { background:#1c1712; }
+    }
+
+    @page {
+      size: A4;
+      margin: 1.8cm;
+      @bottom-right { content: "Página " counter(page); font-family:'Inter',sans-serif; font-size:10px; color:#9a8c7e; }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #folha-impressao, #folha-impressao * { visibility: visible; }
+      #folha-impressao { position: absolute; inset: 0; padding: 0; border: none !important; max-height: none !important; overflow: visible !important; }
+      #folha-impressao img { max-width: 100% !important; }
+      .quebra-pagina { break-before: page; }
+      .capa-livro { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; }
+    }
+  </style>
+</head>
+<body class="bg-brand-50 text-brand-900 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    /* ============================== DADOS-BASE ============================== */
+
+    const CATEGORIAS = [
+      { id:'integramente', nome:'IntegraMente / Psicologia / Desenvolvimento emocional', curto:'IntegraMente', emoji:'🧠', cor:'plum' },
+      { id:'palin',        nome:'Grupo Palin & Martins / Cultura / Liderança / Gestão',  curto:'Grupo Palin', emoji:'🏛️', cor:'brand' },
+      { id:'tributaria',   nome:'Consultoria Tributária / Agro / NR-1 / Empresários',     curto:'Tributário/NR-1', emoji:'📊', cor:'brand' },
+      { id:'palestras',    nome:'Palestras / Aulas / Mentorias / Podcasts',               curto:'Palestras', emoji:'🎤', cor:'plum' },
+      { id:'conteudo',     nome:'Conteúdo para Instagram / Stories / Reels / Carrossel',  curto:'Conteúdo', emoji:'📱', cor:'plum' },
+      { id:'fe',           nome:'Fé cristã / Devocionais / Propósito / Cultura bíblica',  curto:'Fé cristã', emoji:'✝️', cor:'brand' },
+      { id:'projetos',     nome:'Projetos estratégicos / Novos negócios / Clubes / Eventos', curto:'Projetos', emoji:'🚀', cor:'brand' },
+    ];
+    const catById = (id) => CATEGORIAS.find(c => c.id === id) || CATEGORIAS[0];
+
+    const NIVEIS = [
+      { id:'inicial',     nome:'Ideia inicial',  cor:'bg-stone-100 text-stone-700 ring-stone-300' },
+      { id:'pesquisa',    nome:'Em pesquisa',    cor:'bg-amber-100 text-amber-800 ring-amber-300' },
+      { id:'estruturada', nome:'Estruturada',    cor:'bg-blue-100 text-blue-800 ring-blue-300' },
+      { id:'pronta',      nome:'Pronta',         cor:'bg-emerald-100 text-emerald-800 ring-emerald-300' },
+      { id:'publicada',   nome:'Publicada',      cor:'bg-plum-100 text-plum-800 ring-plum-300' },
+    ];
+    const nivelById = (id) => NIVEIS.find(n => n.id === id) || NIVEIS[0];
+
+    const FORMATOS  = ['Palestra','Aula','Post','E-book','Mentoria','Podcast','Vídeo','Carrossel','Proposta comercial','Produto/Método','Evento'];
+    const CONEXOES  = ['Psicologia','Gestão','Fé cristã','NR-1','Cultura organizacional','Liderança','Empresários','Comportamento','Agro'];
+
+    const TIPOS_REF = ['Livro','Artigo','Texto/Documento','Site/Página','Vídeo','Podcast','Outro'];
+    const iconeRef = (t) => ({'Livro':'📕','Artigo':'📄','Texto/Documento':'📃','Site/Página':'🔗','Vídeo':'🎬','Podcast':'🎧','Outro':'📌'})[t] || '📌';
+
+    /* ============================== PROMPTS ============================== */
+    // O marcador {{IDEIA}} é substituído pelo texto que você digitar.
+
+    const PROMPT_MAE = {
+      id:'mae',
+      titulo:'⭐ Prompt-mãe — Registrar nova ideia',
+      desc:'O principal. Use sempre que tiver uma ideia nova: ele organiza, aprofunda e classifica de uma vez.',
+      texto:
+`Ely, estou registrando uma nova ideia para minha Central de Ideias.
+Quero que você organize, aprofunde e classifique essa ideia.
+Analise nos seguintes pontos:
+1. Tema central;
+2. Categoria mais adequada;
+3. Público-alvo;
+4. Problema que essa ideia resolve;
+5. Potencial de aplicação;
+6. Possíveis formatos: palestra, aula, mentoria, post, e-book, podcast, proposta ou produto;
+7. Conexões com meus projetos atuais, especialmente IntegraMente, Grupo Palin & Martins, cultura organizacional, liderança, empresários, NR-1, psicologia e fé cristã;
+8. Sugestão de título;
+9. Próximos passos para desenvolver essa ideia.
+
+Minha ideia é: {{IDEIA}}`
+    };
+
+    const PROMPTS = [
+      {
+        id:'p01', titulo:'01 — Organizar ideia solta', fase:'Fase 1 · Captura',
+        desc:'Para quando você tem uma ideia solta (áudio ou pensamento inicial) e quer organizá-la.',
+        texto:
+`Ely, organize essa ideia em formato estratégico.
+Quero que você identifique:
+1. Qual é o tema central;
+2. Qual problema essa ideia resolve;
+3. Para qual público ela serve;
+4. Quais são os possíveis desdobramentos;
+5. Se ela pode virar palestra, aula, post, mentoria, produto, e-book ou proposta comercial.
+
+Ideia: {{IDEIA}}`
+      },
+      {
+        id:'p02', titulo:'02 — Aprofundar tema', fase:'Fase 2 · Pesquisa',
+        desc:'Para transformar a ideia em pesquisa e desenvolvimento de conteúdo autoral.',
+        texto:
+`Ely, aprofunde esse tema como se fosse uma pesquisa para desenvolvimento de conteúdo autoral.
+Traga:
+1. Conceito principal;
+2. Origem ou base teórica;
+3. Principais autores ou referências;
+4. Aplicação prática para empresários, líderes ou equipes;
+5. Conexões com psicologia, comportamento, gestão e fé cristã, quando fizer sentido;
+6. Possíveis frases fortes;
+7. Ideias de conteúdo derivado.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p03', titulo:'03 — Transformar em estrutura', fase:'Fase 3 · Estrutura',
+        desc:'Quando a ideia já está boa e precisa virar uma estrutura de conteúdo.',
+        texto:
+`Ely, transforme esse tema em uma estrutura completa de conteúdo.
+Quero que você me entregue:
+1. Título principal;
+2. Subtítulo;
+3. Objetivo do conteúdo;
+4. Público-alvo;
+5. Estrutura em tópicos;
+6. Introdução impactante;
+7. Desenvolvimento em blocos;
+8. Conclusão com chamada à ação;
+9. Possíveis formatos: palestra, aula, carrossel, e-book, vídeo ou mentoria.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p04', titulo:'04 — Transformar em palestra / aula', fase:'Fase 4 · Conteúdo final',
+        desc:'Para montar a estrutura de uma apresentação, curso, mentoria ou treinamento.',
+        camposExtras:[
+          {chave:'PUBLICO', rotulo:'Público', placeholder:'ex.: líderes, empresários, equipe...'},
+          {chave:'TEMPO',   rotulo:'Tempo disponível', placeholder:'ex.: 45 minutos, 2 horas...'},
+          {chave:'TOM',     rotulo:'Tom', placeholder:'profissional, espiritual, emocional, corporativo, provocativo...'},
+        ],
+        texto:
+`Ely, transforme essa estrutura em uma palestra/aula com linguagem profunda, didática e elegante.
+Quero uma abertura forte, desenvolvimento por blocos, exemplos práticos, frases de impacto e conclusão memorável.
+O público será: {{PUBLICO}}.
+O tempo disponível será: {{TEMPO}}.
+O tom deve ser: {{TOM}}.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p05', titulo:'05 — Transformar em conteúdo para Instagram', fase:'Fase 4 · Conteúdo final',
+        desc:'Para Instagram: legenda, stories, reels, carrossel e frase de impacto.',
+        texto:
+`Ely, transforme essa ideia em conteúdo para Instagram.
+Crie:
+1. Uma legenda profunda e envolvente;
+2. Uma versão curta para stories;
+3. Um roteiro para reels;
+4. Uma ideia de carrossel com até 7 páginas;
+5. Uma frase de impacto para arte.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p06', titulo:'06 — Transformar em material institucional', fase:'Aplicação',
+        desc:'Para Grupo Palin, IntegraMente, cultura organizacional e propostas comerciais.',
+        texto:
+`Ely, transforme esse tema em material institucional alinhado à minha marca.
+Quero que você entregue:
+1. Posicionamento e mensagem central;
+2. Texto institucional elegante e profissional;
+3. Aplicação para o Grupo Palin & Martins e para a IntegraMente;
+4. Conexão com cultura organizacional, liderança e gestão;
+5. Estrutura de uma proposta comercial (problema, solução, entregáveis, diferenciais);
+6. Tom de autoridade, confiança e cuidado humano.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p07', titulo:'07 — Conectar com fé cristã', fase:'Aplicação',
+        desc:'Para conteúdos devocionais, propósito e princípios bíblicos.',
+        texto:
+`Ely, conecte esse tema com a fé cristã de forma profunda, respeitosa e fundamentada.
+Quero que você traga:
+1. Princípio bíblico central relacionado ao tema;
+2. Referências e passagens que sustentam a reflexão;
+3. Aplicação prática para a vida, a liderança e o propósito;
+4. Um devocional curto (abertura, reflexão e oração);
+5. Uma frase de impacto com base espiritual;
+6. Ponte entre fé, comportamento humano e cultura.
+
+Tema: {{IDEIA}}`
+      },
+      {
+        id:'p08', titulo:'08 — Transformar em produto', fase:'Aplicação',
+        desc:'Para criar mentoria, método, e-book, evento ou programa.',
+        texto:
+`Ely, transforme essa ideia em um produto estruturado.
+Quero que você defina:
+1. Nome e promessa central do produto;
+2. Formato (mentoria, método, e-book, curso, evento ou programa);
+3. Público-alvo e dor que resolve;
+4. Estrutura de módulos ou etapas;
+5. Transformação prometida (antes e depois);
+6. Possível precificação e entregáveis;
+7. Estratégia de lançamento e divulgação;
+8. Próximos passos para tirar do papel.
+
+Tema: {{IDEIA}}`
+      },
+    ];
+
+    /* ============================== STORAGE ============================== */
+
+    const LS_KEY = 'central_ideias_jessica_v1';
+    const carregar = () => {
+      try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+      catch { return []; }
+    };
+    const salvar = (ideias) => localStorage.setItem(LS_KEY, JSON.stringify(ideias));
+    const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+
+    const LS_LIVROS = 'central_ideias_livros_v1';
+    const carregarLivros = () => { try { return JSON.parse(localStorage.getItem(LS_LIVROS)) || []; } catch { return []; } };
+    const salvarLivros = (l) => { try { localStorage.setItem(LS_LIVROS, JSON.stringify(l)); } catch(e){ console.warn('Não foi possível salvar (limite de armazenamento atingido — tente uma imagem de capa menor).', e); } };
+    const contarPalavras = (t) => (t||'').trim() ? t.trim().split(/\s+/).length : 0;
+
+    const LS_REFS = 'central_ideias_referencias_v1';
+    const carregarRefs = () => { try { return JSON.parse(localStorage.getItem(LS_REFS)) || []; } catch { return []; } };
+    const salvarRefs = (r) => { try { localStorage.setItem(LS_REFS, JSON.stringify(r)); } catch(e){ console.warn('Não foi possível salvar referências (limite de armazenamento).', e); } };
+    const citacaoRef = (r) => {
+      const p = [];
+      if (r.autor) p.push(r.autor.toUpperCase().replace(/\.+$/,'') + '.');
+      if (r.titulo) p.push(r.titulo + '.');
+      if (r.fonte) p.push(r.fonte + '.');
+      if (r.ano) p.push(String(r.ano) + '.');
+      let s = p.join(' ').trim();
+      if (r.link) s += (s ? ' ' : '') + 'Disponível em: ' + r.link;
+      return s || r.titulo || '(referência sem dados)';
+    };
+
+    const formatarTamanho = (b) => {
+      if (!b && b!==0) return '';
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b/1024).toFixed(0) + ' KB';
+      return (b/1048576).toFixed(1) + ' MB';
+    };
+
+    /* anexos em IndexedDB (suporta arquivos grandes, ex.: PDFs) */
+    const DB_NAME = 'central_ideias_db', STORE_ANEXOS = 'anexos';
+    let _dbp;
+    const idb = () => _dbp || (_dbp = new Promise((res, rej) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => { if (!req.result.objectStoreNames.contains(STORE_ANEXOS)) req.result.createObjectStore(STORE_ANEXOS); };
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    }));
+    const idbSet = async (key, val) => { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE_ANEXOS,'readwrite'); tx.objectStore(STORE_ANEXOS).put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); };
+    const idbGet = async (key) => { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE_ANEXOS,'readonly'); const r = tx.objectStore(STORE_ANEXOS).get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); };
+    const idbDel = async (key) => { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE_ANEXOS,'readwrite'); tx.objectStore(STORE_ANEXOS).delete(key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); };
+    const abrirAnexo = async (anexo, onErro) => {
+      try {
+        const blob = await idbGet(anexo.id);
+        if (!blob) { onErro && onErro(); return; }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60000);
+      } catch { onErro && onErro(); }
+    };
+
+    const lerImagemRedimensionada = (file, maxW=1000) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const escala = Math.min(1, maxW / img.width);
+          const w = Math.round(img.width*escala), h = Math.round(img.height*escala);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const hojeISO = () => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2,'0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+    };
+
+    const emDias = (n) => {
+      const d = new Date(); d.setDate(d.getDate()+n);
+      const p = (x) => String(x).padStart(2,'0');
+      return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+    };
+
+    const formatarData = (iso) => {
+      if (!iso) return '';
+      const [y,m,d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    };
+    const legacyReflexoes = (notas) => {
+      const out = []; const re = /—\s*Reflex[ãa]o\s*\(([^)]+)\):\s*([^\n]+)/g; let m;
+      while ((m = re.exec(notas||''))) out.push({ data:m[1], texto:m[2].trim() });
+      return out;
+    };
+    const getReflexoes = (i) => [ ...(i.reflexoes||[]).map(r=>({data:formatarData(r.data), texto:r.texto})), ...legacyReflexoes(i.notas) ];
+    const diffDias = (iso) => {
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const [y,m,d] = iso.split('-').map(Number);
+      const alvo = new Date(y, m-1, d); alvo.setHours(0,0,0,0);
+      return Math.round((alvo - hoje) / 86400000);
+    };
+    const rotuloPrazo = (iso) => {
+      const n = diffDias(iso);
+      if (n < 0)  return { txt:`Atrasado ${-n}d`, cor:'bg-red-100 text-red-700 ring-red-300' };
+      if (n === 0) return { txt:'Hoje',   cor:'bg-amber-100 text-amber-800 ring-amber-300' };
+      if (n === 1) return { txt:'Amanhã', cor:'bg-amber-100 text-amber-800 ring-amber-300' };
+      if (n <= 7)  return { txt:`Em ${n} dias`, cor:'bg-blue-100 text-blue-800 ring-blue-300' };
+      return { txt:`Em ${n} dias`, cor:'bg-stone-100 text-stone-600 ring-stone-300' };
+    };
+    const escICS = (s) => String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
+    const icsDeIdeia = (ideia) => {
+      const d = (ideia.prazo || hojeISO()).replace(/-/g,'');
+      const resumo = escICS(ideia.proximo || ideia.nome || 'Próximo passo');
+      const desc = escICS(`Ideia: ${ideia.nome}` + (ideia.proximo ? ` — ${ideia.proximo}` : ''));
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Central de Ideias//PT-BR','CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',`UID:${ideia.id}@central-de-ideias`,
+        `DTSTART:${d}T090000`,`DTEND:${d}T093000`,
+        `SUMMARY:${resumo}`,`DESCRIPTION:${desc}`,
+        'BEGIN:VALARM','ACTION:DISPLAY','TRIGGER:-PT30M',`DESCRIPTION:${resumo}`,'END:VALARM',
+        'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    };
+
+    /* ===== MENTOR (coach que questiona) ===== */
+    const PERSONA_SISTEMA = `Você é o "Mentor" da Jéssica, dentro do app pessoal dela (Central de Ideias). Seu papel NÃO é concordar nem agradar — é fazê-la PENSAR e AGIR.
+
+Sobre a Jéssica:
+- Temperamento FLEUMÁTICO: tende a evitar conflito, acomodar-se, manter a paz e PROCRASTINAR. Combata isso pedindo compromissos concretos, pequenos e com prazo. Não aceite "depois", "talvez", "quando der".
+- Eneagrama TIPO 8: intensa, líder, quer controle e justiça, protege os seus, mas pode endurecer, evitar a própria vulnerabilidade e querer resolver tudo na força. Fale com firmeza (ela não recua de confronto), respeite a força dela, e ao mesmo tempo convide-a a olhar a vulnerabilidade e a não atropelar as pessoas.
+- VALOR CENTRAL dela: não desistir das pessoas. Quando ela quiser cortar alguém, faça-a refletir antes — sem ingenuidade.
+
+Como você age:
+- Questione mais do que afirma. Faça no máximo 1-2 perguntas fortes por resposta.
+- Não a deixe procrastinar: exija o próximo passo concreto, mensurável e com prazo. Aponte as desculpas.
+- Traga-a para a realidade: peça fatos e evidências, não suposições. Aponte pontos cegos.
+- Discorde quando fizer sentido. Nada de bajulação.
+- Seja breve (2 a 6 frases), direto e caloroso. Português do Brasil. Pode chamá-la de Jéssica.
+- Ancore no que ela disse e nos dados reais dela. Termine quase sempre com uma pergunta que a obrigue a se posicionar ou agir.`;
+
+    const realityLinha = (ctx) => {
+      if (!ctx.atrasados.length) return '';
+      const o = ctx.atrasados[0];
+      return `📌 Realidade: você tem ${ctx.atrasados.length} próximo(s) passo(s) atrasado(s). O mais antigo — "${o.proximo||o.nome}" — está parado há ${-diffDias(o.prazo)} dias. Qual ação de 15 minutos destrava ele agora?`;
+    };
+    const realityCheckCompleto = (ctx) => {
+      if (!ctx.atrasados.length) return 'Você não tem nenhum próximo passo atrasado agora, Jéssica. Então a pergunta muda: você está sendo ambiciosa o bastante ou só confortável? Qual ideia parada merece um prazo ainda hoje — e qual é ele?';
+      const lista = ctx.atrasados.slice(0,5).map(i=>`• ${-diffDias(i.prazo)}d atrás — ${i.proximo||i.nome} (${i.nome})`).join('\n');
+      return `Vamos encarar a realidade, sem suavizar:\n\n${lista}\n\nNada disso some sozinho. Escolha UM agora: qual você resolve hoje, e a que horas? Sem "depois".`;
+    };
+    const _bancosMentor = {
+      proc: [
+        "Jéssica, \"depois\" é o jeito educado de dizer \"não\". O que você ganha adiando isso — e o que perde? Qual a menor ação que dá pra fazer nos próximos 30 minutos?",
+        "Fleumática que é você adora esperar a hora certa. Spoiler: ela não vem. Que passo você se compromete a dar HOJE, com hora marcada?",
+        "Você não está sem tempo — está sem decisão. Se isso fosse inegociável, o que faria ainda hoje? Por que não está fazendo?",
+        "Cansaço é real, mas também é um ótimo álibi. O que aí é cansaço de verdade e o que é fuga? Diga a próxima ação, pequena e específica.",
+      ],
+      pessoas: [
+        "Antes de fechar a porta: você está reagindo ao que a pessoa fez ou ao que imaginou que ela quis dizer? Que conversa franca ainda não teve com ela?",
+        "Como 8, você protege os seus com força — e também cobra demais. O que essa pessoa precisa de você que ainda não recebeu: clareza, limite ou paciência?",
+        "Desistir é rápido; formar gente é lento. Se você NÃO desistisse dela, qual seria o próximo passo? O que te custaria tentar mais uma vez, com um limite claro?",
+      ],
+      desistir: [
+        "Você quer desistir disso ou descansar disso? São coisas diferentes. Se amanhã acordasse com energia, ainda largaria?",
+        "Cansar faz parte; desistir é decisão. Qual é o motivo real — está difícil, ou está te confrontando com algo que você não quer encarar?",
+        "Você não desiste das pessoas. Então por que está pronta a desistir de você nessa? O que mudaria se desse só mais um passo?",
+      ],
+      medo: [
+        "Você não teme o fracasso, Jéssica — teme não ter controle. Onde exatamente está tentando controlar o incontrolável? E se pedisse ajuda?",
+        "Mostrar que não sabe não é fraqueza, é dado. Quem poderia te ajudar nisso se você baixasse a guarda? O que te impede?",
+        "Que verdade sobre essa situação você está evitando olhar? Diga em uma frase, sem suavizar.",
+      ],
+      raiva: [
+        "Sua intensidade é força quando aponta pro lugar certo. Essa raiva está te movendo ou te queimando? O que ela tenta proteger?",
+        "Justiça é sua bandeira, e é legítima. Mas que parte da história você ainda não olhou do outro lado? O que muda se estiver 10% errada?",
+        "Bater de frente resolve ou só alivia? O que você realmente quer daqui: vencer a discussão ou mudar a situação?",
+      ],
+      decisao: [
+        "Decidir te assusta menos que errar. Quais são as duas opções, em uma frase cada? E qual você já sabe a resposta, mas não quer admitir?",
+        "Se tivesse que decidir nos próximos 10 minutos, o que escolheria? O que esse impulso te diz?",
+        "Não decidir já é decidir — a favor do que está aí. É isso que você quer? Qual o custo de adiar mais uma semana?",
+      ],
+      avanco: [
+        "Boa. Agora não pare no aplauso: o que esse avanço te ensina sobre o que você é capaz quando para de adiar? Qual o próximo passo, hoje?",
+        "Comemorou? Ótimo. Qual o próximo degrau — e quando? Não deixe a vitória virar pausa longa.",
+      ],
+      fallback: [
+        "Interessante. Me diga: o que você quer de verdade aqui — e o que está te impedindo? Seja específica.",
+        "Vou te devolver a pergunta: se fosse 100% honesta consigo mesma, qual é o assunto real por trás disso?",
+        "Não vou te dar resposta pronta. Que decisão ou ação essa conversa está pedindo de você? Em uma frase.",
+        "O que muda na sua vida se você encarar isso hoje, em vez de \"depois\"? E o que muda se não encarar?",
+      ],
+    };
+    const mentorLocal = (texto, ctx, n) => {
+      const t = ' ' + (texto||'').toLowerCase() + ' ';
+      const tem = (re) => re.test(t);
+      const pick = (arr) => arr[(n||0) % arr.length];
+      if (tem(/(prazo|atrasad|reality|me cobr|cobran|minhas ideias|meus prazos)/)) return realityCheckCompleto(ctx);
+      if (tem(/(desist|larga|larguei|n[aã]o vale a pena|sem sentido|cortar ela|cortar ele|cansei de tudo)/)) return pick(_bancosMentor.desistir);
+      if (tem(/(pessoa|equipe|fulan|decepc|magou|magoou|tra[ií]|n[aã]o confio|sozinh|ningu[eé]m|conflito|briga|cobrar|l[ií]der|s[oó]cio|fam[ií]lia|marido|filh|amig)/)) return pick(_bancosMentor.pessoas);
+      if (tem(/(medo|inseg|vergonha|fr[aá]gil|fraqu|vulner|perder o controle|e se der errado|ansiedad)/)) return pick(_bancosMentor.medo);
+      if (tem(/(raiva|injust|revolt|irritad|[oó]dio|controlar|do meu jeito|na marra|na for[çc]a)/)) return pick(_bancosMentor.raiva);
+      if (tem(/(decid|escolh|n[aã]o sei o que fazer|d[uú]vida|dois caminhos|qual.*melhor|qual.*caminho)/)) return pick(_bancosMentor.decisao);
+      if (tem(/(depois|amanh|mais tarde|semana que vem|pregui|sem tempo|ocupad|cansad|n[aã]o comecei|ainda n[aã]o|vou tentar|talvez|qualquer dia|enrol|adiar|adiei|procrastin|deixei pra|deixar pra|sem [aâ]nimo)/)) return pick(_bancosMentor.proc) + (ctx.atrasados.length ? '\n\n'+realityLinha(ctx) : '');
+      if (tem(/(consegui|terminei|finalizei|deu certo|avancei|completei|publiquei|conclu[ií]|fiz isso|fiz o)/)) return pick(_bancosMentor.avanco);
+      return pick(_bancosMentor.fallback) + (ctx.atrasados.length && (n%2===0) ? '\n\n'+realityLinha(ctx) : '');
+    };
+
+    const nomePadronizado = (ideia) => {
+      const cat = catById(ideia.categoria).curto;
+      const niv = nivelById(ideia.nivel).nome;
+      const tema = (ideia.nome || 'Sem título').trim();
+      return `${ideia.data || hojeISO()} | ${cat} | ${tema} | ${niv}`;
+    };
+
+    const aplicarPrompt = (texto, ideia, extras={}) => {
+      let resumo = ideia ? montarResumoIdeia(ideia) : '[colar aqui]';
+      let out = texto.replaceAll('{{IDEIA}}', resumo);
+      for (const [k,v] of Object.entries(extras)) {
+        out = out.replaceAll(`{{${k}}}`, v && v.trim() ? v.trim() : `[${k.toLowerCase()}]`);
+      }
+      out = out.replace(/\{\{[A-Z]+\}\}/g, (m) => `[${m.slice(2,-2).toLowerCase()}]`);
+      return out;
+    };
+
+    const montarResumoIdeia = (i) => {
+      const partes = [];
+      if (i.nome) partes.push(i.nome);
+      if (i.problema) partes.push(`Problema que resolve: ${i.problema}`);
+      if (i.publico) partes.push(`Público-alvo: ${i.publico}`);
+      if (i.formatos && i.formatos.length) partes.push(`Formatos possíveis: ${i.formatos.join(', ')}`);
+      if (i.proximo) partes.push(`Próximo passo: ${i.proximo}`);
+      return partes.join('. ');
+    };
+
+    /* ============================== UI HELPERS ============================== */
+
+    function Pill({children, className=''}) {
+      return <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ${className}`}>{children}</span>;
+    }
+
+    function useToast() {
+      const [msg, setMsg] = useState(null);
+      const show = (m) => { setMsg(m); setTimeout(()=>setMsg(null), 2200); };
+      const node = msg ? (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-medium" data-anim>
+          {msg}
+        </div>
+      ) : null;
+      return [node, show];
+    }
+
+    const copiar = async (texto, onOk) => {
+      try { await navigator.clipboard.writeText(texto); onOk && onOk(); }
+      catch {
+        const ta = document.createElement('textarea');
+        ta.value = texto; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove(); onOk && onOk();
+      }
+    };
+
+    /* ============================== FORMULÁRIO (FICHA) ============================== */
+
+    function FichaForm({ inicial, onSalvar, onCancelar, projetos }) {
+      const [f, setF] = useState(inicial || {
+        nome:'', categoria:CATEGORIAS[0].id, projeto:'', publico:'', problema:'',
+        formatos:[], nivel:'inicial', conexoes:[], proximo:'', prazo:'', data:hojeISO(), notas:''
+      });
+      const set = (k,v) => setF(s => ({...s,[k]:v}));
+      const toggle = (k,v) => setF(s => ({...s, [k]: s[k].includes(v) ? s[k].filter(x=>x!==v) : [...s[k], v]}));
+
+      const submit = (e) => {
+        e.preventDefault();
+        if (!f.nome.trim()) return;
+        onSalvar(f);
+      };
+
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300 focus:border-plum-300 placeholder:text-brand-300";
+      const label = "block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5";
+
+      return (
+        <form onSubmit={submit} className="space-y-5" data-anim>
+          <div>
+            <label className={label}>Nome da ideia *</label>
+            <input className={campoCls} value={f.nome} onChange={e=>set('nome',e.target.value)} placeholder="Ex.: Autorresponsabilidade emocional" autoFocus />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Categoria</label>
+              <select className={campoCls} value={f.categoria} onChange={e=>set('categoria',e.target.value)}>
+                {CATEGORIAS.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.curto}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={label}>Nível de maturidade</label>
+              <select className={campoCls} value={f.nivel} onChange={e=>set('nivel',e.target.value)}>
+                {NIVEIS.map(n => <option key={n.id} value={n.id}>{n.nome}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Público-alvo</label>
+              <input className={campoCls} value={f.publico} onChange={e=>set('publico',e.target.value)} placeholder="Ex.: líderes e empresários" />
+            </div>
+            <div>
+              <label className={label}>Data</label>
+              <input type="date" className={campoCls} value={f.data} onChange={e=>set('data',e.target.value)} />
+            </div>
+          </div>
+
+          <div>
+            <label className={label}>Projeto / subpasta</label>
+            <input className={campoCls} list="lista-projetos" value={f.projeto} onChange={e=>set('projeto',e.target.value)} placeholder="Ex.: Lançamento mentoria, Cultura Lagoinha, Curso NR-1..." />
+            <datalist id="lista-projetos">
+              {(projetos||[]).map(p => <option key={p} value={p} />)}
+            </datalist>
+            <p className="mt-1 text-xs text-brand-400">Opcional. Agrupe várias ideias do mesmo projeto sob um nome.</p>
+          </div>
+
+          <div>
+            <label className={label}>Problema que resolve</label>
+            <textarea rows="2" className={campoCls} value={f.problema} onChange={e=>set('problema',e.target.value)} placeholder="Que dor ou necessidade essa ideia atende?" />
+          </div>
+
+          <div>
+            <label className={label}>Formato possível</label>
+            <div className="flex flex-wrap gap-2">
+              {FORMATOS.map(x => (
+                <button type="button" key={x} onClick={()=>toggle('formatos',x)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium ring-1 transition ${f.formatos.includes(x) ? 'bg-plum-600 text-white ring-plum-600' : 'bg-white text-brand-700 ring-brand-200 hover:ring-plum-300'}`}>
+                  {x}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className={label}>Conexões</label>
+            <div className="flex flex-wrap gap-2">
+              {CONEXOES.map(x => (
+                <button type="button" key={x} onClick={()=>toggle('conexoes',x)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium ring-1 transition ${f.conexoes.includes(x) ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-brand-700 ring-brand-200 hover:ring-brand-300'}`}>
+                  {x}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Próximo passo</label>
+              <input className={campoCls} value={f.proximo} onChange={e=>set('proximo',e.target.value)} placeholder="Qual a próxima ação para desenvolver?" />
+            </div>
+            <div>
+              <label className={label}>Prazo do próximo passo</label>
+              <input type="date" className={campoCls} value={f.prazo||''} onChange={e=>set('prazo',e.target.value)} />
+            </div>
+          </div>
+
+          <div>
+            <label className={label}>Notas / observações</label>
+            <textarea rows="2" className={campoCls} value={f.notas} onChange={e=>set('notas',e.target.value)} placeholder="Anotações livres, links, referências..." />
+          </div>
+
+          {((f.reflexoes && f.reflexoes.length>0) || legacyReflexoes(f.notas).length>0) &&
+            <div>
+              <label className={label}>💭 Reflexões salvas (do Mentor)</label>
+              <div className="space-y-2">
+                {(f.reflexoes||[]).map((r,idx) => (
+                  <div key={idx} className="rounded-xl border border-plum-200 bg-plum-50 px-3 py-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-sm text-brand-700 whitespace-pre-wrap">{r.texto}</span>
+                      <button type="button" onClick={()=>set('reflexoes', f.reflexoes.filter((_,j)=>j!==idx))} title="Remover reflexão" className="text-brand-400 hover:text-red-600 shrink-0">✕</button>
+                    </div>
+                    <div className="text-xs text-brand-400 mt-1">📅 {formatarData(r.data)}</div>
+                  </div>
+                ))}
+                {legacyReflexoes(f.notas).map((r,idx) => (
+                  <div key={'l'+idx} className="rounded-xl border border-plum-200 bg-plum-50 px-3 py-2">
+                    <span className="text-sm text-brand-700 whitespace-pre-wrap">{r.texto}</span>
+                    <div className="text-xs text-brand-400 mt-1">📅 {r.data} · (em notas)</div>
+                  </div>
+                ))}
+              </div>
+            </div>}
+
+          <div className="rounded-xl bg-brand-100/70 border border-brand-200 px-4 py-3">
+            <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">Nome do arquivo (gerado automático)</span>
+            <p className="mt-1 font-mono text-sm text-brand-800 break-words">{nomePadronizado(f)}</p>
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button type="submit" className="flex-1 bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition shadow-sm">Salvar ideia</button>
+            <button type="button" onClick={onCancelar} className="px-5 py-2.5 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Cancelar</button>
+          </div>
+        </form>
+      );
+    }
+
+    /* ============================== CARD DE IDEIA ============================== */
+
+    function IdeiaCard({ ideia, onEditar, onExcluir, onUsarPrompt, onCopiarFicha, onExportar, onEnviarLivro, refsCount, onVerRefs }) {
+      const cat = catById(ideia.categoria);
+      const niv = nivelById(ideia.nivel);
+      return (
+        <div className="bg-white rounded-2xl border border-brand-200 p-5 shadow-sm hover:shadow-md transition flex flex-col" data-anim>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-xs text-brand-500 mb-1">
+                <span>{cat.emoji} {cat.curto}</span>
+                <span>·</span>
+                <span>{ideia.data}</span>
+              </div>
+              <h3 className="font-serif text-lg leading-snug text-brand-900 break-words">{ideia.nome}</h3>
+            </div>
+            <Pill className={niv.cor}>{niv.nome}</Pill>
+          </div>
+
+          {ideia.problema && <p className="mt-3 text-sm text-brand-700 line-clamp-3">{ideia.problema}</p>}
+
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {ideia.publico && <Pill className="bg-brand-50 text-brand-600 ring-brand-200">👤 {ideia.publico}</Pill>}
+            {(ideia.formatos||[]).map(x => <Pill key={x} className="bg-plum-50 text-plum-700 ring-plum-200">{x}</Pill>)}
+          </div>
+
+          {(ideia.conexoes||[]).length>0 &&
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {ideia.conexoes.map(x => <Pill key={x} className="bg-brand-100 text-brand-600 ring-brand-200">#{x}</Pill>)}
+            </div>}
+
+          {(refsCount>0 || getReflexoes(ideia).length>0) &&
+            <div className="mt-3 flex flex-wrap gap-2">
+              {refsCount>0 &&
+                <button onClick={()=>onVerRefs(ideia)} className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-plum-50 text-plum-700 ring-1 ring-plum-200 hover:bg-plum-100 transition">
+                  📚 {refsCount} referência{refsCount>1?'s':''}
+                </button>}
+              {getReflexoes(ideia).length>0 &&
+                <button onClick={()=>onEditar(ideia)} className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-plum-50 text-plum-700 ring-1 ring-plum-200 hover:bg-plum-100 transition">
+                  💭 {getReflexoes(ideia).length} reflexã{getReflexoes(ideia).length>1?'es':'o'}
+                </button>}
+            </div>}
+
+          {ideia.proximo &&
+            <div className="mt-3 text-xs text-brand-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              <div className="flex items-start justify-between gap-2">
+                <span><span className="font-semibold">Próximo passo:</span> {ideia.proximo}</span>
+                {ideia.prazo && <Pill className={`shrink-0 ${rotuloPrazo(ideia.prazo).cor}`}>{rotuloPrazo(ideia.prazo).txt}</Pill>}
+              </div>
+              {ideia.prazo && <div className="mt-1 text-brand-400">📅 {formatarData(ideia.prazo)}</div>}
+            </div>}
+
+          <div className="mt-auto pt-4 flex flex-wrap gap-2 text-sm">
+            <button onClick={()=>onUsarPrompt(ideia)} className="flex-1 min-w-[120px] bg-plum-600 hover:bg-plum-700 text-white font-medium py-2 rounded-lg transition">Usar nos prompts</button>
+            <button onClick={()=>onCopiarFicha(ideia)} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">Copiar ficha</button>
+            <button onClick={()=>onExportar(ideia)} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">Exportar</button>
+            <button onClick={()=>onEnviarLivro(ideia)} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">📖 Livro</button>
+            <button onClick={()=>onEditar(ideia)} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">Editar</button>
+            <button onClick={()=>onExcluir(ideia)} className="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition">Excluir</button>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================== KANBAN ============================== */
+
+    function KanbanCard({ ideia, onEditar, onDragStart }) {
+      const cat = catById(ideia.categoria);
+      return (
+        <div draggable
+          onDragStart={()=>onDragStart(ideia.id)}
+          onClick={()=>onEditar(ideia)}
+          className="bg-white rounded-xl border border-brand-200 p-3 shadow-sm hover:shadow-md hover:border-plum-300 transition cursor-grab active:cursor-grabbing" data-anim>
+          <div className="text-[11px] text-brand-500 mb-1">{cat.emoji} {cat.curto}{ideia.projeto?` · 📁 ${ideia.projeto}`:''}</div>
+          <h4 className="font-serif text-sm leading-snug text-brand-900 break-words">{ideia.nome}</h4>
+          {(ideia.formatos||[]).length>0 &&
+            <div className="mt-2 flex flex-wrap gap-1">
+              {ideia.formatos.slice(0,3).map(x=><span key={x} className="text-[10px] px-1.5 py-0.5 rounded-full bg-plum-50 text-plum-700 ring-1 ring-plum-200">{x}</span>)}
+            </div>}
+        </div>
+      );
+    }
+
+    function KanbanBoard({ ideias, onEditar, onMover }) {
+      const [over, setOver] = useState(null);
+      const dragId = useRef(null);
+      return (
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+          {NIVEIS.map(n => {
+            const cards = ideias.filter(i => i.nivel===n.id);
+            return (
+              <div key={n.id}
+                onDragOver={e=>{ e.preventDefault(); setOver(n.id); }}
+                onDragLeave={()=>setOver(o=>o===n.id?null:o)}
+                onDrop={()=>{ if(dragId.current) onMover(dragId.current, n.id); dragId.current=null; setOver(null); }}
+                className={`rounded-2xl border p-3 min-h-[140px] transition ${over===n.id?'border-plum-400 bg-plum-50 ring-2 ring-plum-200':'border-brand-200 bg-brand-100/40'}`}>
+                <div className="flex items-center justify-between mb-3 px-1">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">{n.nome}</span>
+                  <span className="text-xs text-brand-400">{cards.length}</span>
+                </div>
+                <div className="space-y-3">
+                  {cards.map(i => <KanbanCard key={i.id} ideia={i} onEditar={onEditar} onDragStart={(id)=>dragId.current=id} />)}
+                  {cards.length===0 && <p className="text-xs text-brand-300 text-center py-4">—</p>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    /* ============================== FOLHA DE EXPORTAÇÃO ============================== */
+
+    function FolhaImpressao({ ideia:i }) {
+      const cat = catById(i.categoria), niv = nivelById(i.nivel);
+      const Sec = ({titulo, children}) => children ? (
+        <div className="mt-3">
+          <div className="text-xs font-semibold uppercase tracking-wide text-brand-500">{titulo}</div>
+          <div className="text-sm text-brand-800 whitespace-pre-wrap">{children}</div>
+        </div>
+      ) : null;
+      return (
+        <div>
+          <div className="text-xs text-brand-500">{cat.emoji} {cat.nome}</div>
+          <h1 className="font-serif text-2xl text-brand-900 mt-1">{i.nome}</h1>
+          <div className="mt-1 text-sm text-brand-500">{i.projeto?`📁 ${i.projeto} · `:''}{formatarData(i.data)} · {niv.nome}</div>
+          <Sec titulo="Público-alvo">{i.publico}</Sec>
+          <Sec titulo="Problema que resolve">{i.problema}</Sec>
+          <Sec titulo="Formatos possíveis">{(i.formatos||[]).join(', ')}</Sec>
+          <Sec titulo="Conexões">{(i.conexoes||[]).join(', ')}</Sec>
+          <Sec titulo="Próximo passo">{i.proximo ? `${i.proximo}${i.prazo?`  (prazo: ${formatarData(i.prazo)})`:''}` : ''}</Sec>
+          <Sec titulo="Notas">{i.notas}</Sec>
+          {(i.reflexoes||[]).length>0 &&
+            <div className="mt-3">
+              <div className="text-xs font-semibold uppercase tracking-wide text-brand-500">Reflexões</div>
+              {(i.reflexoes||[]).map((r,idx)=>(
+                <div key={idx} className="text-sm text-brand-800 mt-1">• {r.texto} <span className="text-brand-400">({formatarData(r.data)})</span></div>
+              ))}
+            </div>}
+          <div className="mt-4 pt-3 border-t border-brand-200 text-xs text-brand-400 font-mono">{nomePadronizado(i)}</div>
+        </div>
+      );
+    }
+
+    const textoExport = (i) => {
+      const l = [];
+      l.push(i.nome, '');
+      l.push(`Categoria: ${catById(i.categoria).nome}`);
+      if (i.projeto) l.push(`Projeto: ${i.projeto}`);
+      l.push(`Nível de maturidade: ${nivelById(i.nivel).nome}`);
+      l.push(`Data: ${formatarData(i.data)}`);
+      if (i.publico) l.push(`Público-alvo: ${i.publico}`);
+      if (i.problema) l.push('', 'Problema que resolve:', i.problema);
+      if ((i.formatos||[]).length) l.push('', `Formatos possíveis: ${i.formatos.join(', ')}`);
+      if ((i.conexoes||[]).length) l.push(`Conexões: ${i.conexoes.join(', ')}`);
+      if (i.proximo) l.push('', `Próximo passo: ${i.proximo}${i.prazo?` (prazo: ${formatarData(i.prazo)})`:''}`);
+      if (i.notas) l.push('', 'Notas:', i.notas);
+      if ((i.reflexoes||[]).length) { l.push('', 'Reflexões:'); i.reflexoes.forEach(r=>l.push(`• ${r.texto} (${formatarData(r.data)})`)); }
+      l.push('', `— ${nomePadronizado(i)}`);
+      return l.join('\n');
+    };
+
+    /* ============================== BIBLIOTECA DE PROMPTS ============================== */
+
+    function PromptCard({ prompt, ideia, onCopiado }) {
+      const [aberto, setAberto] = useState(false);
+      const [ideiaTexto, setIdeiaTexto] = useState('');
+      const [extras, setExtras] = useState({});
+
+      const ideiaParaUsar = ideia
+        ? ideia
+        : (ideiaTexto.trim() ? { nome: ideiaTexto } : null);
+
+      const textoFinal = aplicarPrompt(prompt.texto, ideiaParaUsar, extras);
+
+      return (
+        <div className="bg-white rounded-2xl border border-brand-200 shadow-sm overflow-hidden" data-anim>
+          <button onClick={()=>setAberto(a=>!a)} className="w-full text-left px-5 py-4 flex items-start justify-between gap-3 hover:bg-brand-50/60 transition">
+            <div>
+              {prompt.fase && <div className="text-[11px] font-semibold uppercase tracking-wide text-plum-600 mb-0.5">{prompt.fase}</div>}
+              <h3 className="font-serif text-lg text-brand-900">{prompt.titulo}</h3>
+              <p className="text-sm text-brand-600 mt-0.5">{prompt.desc}</p>
+            </div>
+            <span className={`text-brand-400 transition mt-1 ${aberto?'rotate-180':''}`}>▾</span>
+          </button>
+
+          {aberto && (
+            <div className="px-5 pb-5 space-y-3 border-t border-brand-100" data-anim>
+              {ideia ? (
+                <div className="mt-3 text-xs bg-plum-50 border border-plum-200 text-plum-800 rounded-lg px-3 py-2">
+                  Usando a ideia selecionada: <strong>{ideia.nome}</strong>
+                </div>
+              ) : (
+                <textarea
+                  rows="2"
+                  className="mt-3 w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300"
+                  placeholder="Cole ou digite sua ideia aqui..."
+                  value={ideiaTexto}
+                  onChange={e=>setIdeiaTexto(e.target.value)}
+                />
+              )}
+
+              {(prompt.camposExtras||[]).map(c => (
+                <input key={c.chave}
+                  className="w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300"
+                  placeholder={`${c.rotulo}: ${c.placeholder}`}
+                  value={extras[c.chave]||''}
+                  onChange={e=>setExtras(s=>({...s,[c.chave]:e.target.value}))}
+                />
+              ))}
+
+              <pre className="whitespace-pre-wrap text-sm text-brand-800 bg-brand-50 border border-brand-200 rounded-xl p-4 font-sans max-h-72 overflow-auto">{textoFinal}</pre>
+
+              <button onClick={()=>copiar(textoFinal, onCopiado)} className="w-full bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">
+                Copiar prompt
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ============================== LIVRO / MANUSCRITO ============================== */
+
+    function ManuscritoImpressao({ livro, ideias }) {
+      const idById = (id) => ideias.find(i => i.id===id);
+      return (
+        <div>
+          <div className="capa-livro text-center py-6 mb-4 border-b border-brand-200">
+            {livro.capa && <img src={livro.capa} alt="Capa" className="mx-auto mb-6 max-h-80 rounded-lg object-contain" />}
+            <h1 className="font-serif text-3xl text-brand-900">{livro.titulo || 'Sem título'}</h1>
+            {livro.subtitulo && <p className="font-serif text-lg text-brand-600 mt-2">{livro.subtitulo}</p>}
+            {livro.autor && <p className="text-sm text-brand-500 mt-4">{livro.autor}</p>}
+          </div>
+          <div className="quebra-pagina"></div>
+          {livro.sinopse && <p className="text-sm text-brand-700 whitespace-pre-wrap mb-6 italic">{livro.sinopse}</p>}
+          {livro.capitulos.length>0 &&
+            <div className="mb-8">
+              <h2 className="font-serif text-xl text-brand-900 mb-2">Sumário</h2>
+              <ol className="text-sm text-brand-700 list-decimal pl-5 space-y-1">
+                {livro.capitulos.map(c => <li key={c.id}>{c.titulo || '(sem título)'}</li>)}
+              </ol>
+            </div>}
+          {livro.capitulos.map((c,idx) => (
+            <div key={c.id} className="mb-7">
+              <h2 className="font-serif text-2xl text-brand-900 mb-1">{idx+1}. {c.titulo || '(sem título)'}</h2>
+              {c.descricao && <p className="text-sm text-brand-500 italic mb-2">{c.descricao}</p>}
+              {c.texto
+                ? <p className="text-sm text-brand-800 whitespace-pre-wrap leading-relaxed">{c.texto}</p>
+                : <p className="text-sm text-brand-400 italic">(capítulo ainda sem texto — material de apoio: {(c.ideiaIds||[]).map(id=>idById(id)?.nome).filter(Boolean).join('; ') || 'nenhum'})</p>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    const textoLivro = (livro, ideias) => {
+      const idById = (id) => ideias.find(i => i.id===id);
+      const l = [];
+      l.push((livro.titulo||'Sem título').toUpperCase());
+      if (livro.subtitulo) l.push(livro.subtitulo);
+      if (livro.autor) l.push(`por ${livro.autor}`);
+      l.push('', '');
+      if (livro.sinopse) l.push(livro.sinopse, '', '');
+      if (livro.capitulos.length) {
+        l.push('SUMÁRIO');
+        livro.capitulos.forEach((c,i)=> l.push(`${i+1}. ${c.titulo||'(sem título)'}`));
+        l.push('', '');
+      }
+      livro.capitulos.forEach((c,idx) => {
+        l.push('', `${idx+1}. ${(c.titulo||'(sem título)').toUpperCase()}`, '');
+        if (c.descricao) l.push(c.descricao, '');
+        if (c.texto) l.push(c.texto);
+        else {
+          const apoio = (c.ideiaIds||[]).map(id=>idById(id)?.nome).filter(Boolean).join('; ');
+          l.push(`(sem texto — material de apoio: ${apoio||'nenhum'})`);
+        }
+        l.push('');
+      });
+      return l.join('\n');
+    };
+
+    /* ============================== CAPÍTULO ============================== */
+
+    function CapituloBlock({ cap, idx, total, ideias, onUpd, onRemover, onMover, onAbrirPicker }) {
+      const idById = (id) => ideias.find(i => i.id===id);
+      const vinculadas = (cap.ideiaIds||[]).map(idById).filter(Boolean);
+      const palavras = contarPalavras(cap.texto);
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+
+      const montarRascunho = () => {
+        const partes = [];
+        vinculadas.forEach(i => {
+          partes.push(`## ${i.nome}`);
+          if (i.problema) partes.push(i.problema);
+          if (i.notas) partes.push(i.notas);
+          partes.push('');
+        });
+        const rascunho = partes.join('\n').trim();
+        if (!rascunho) return;
+        if (cap.texto && cap.texto.trim() && !confirm('Acrescentar o rascunho das ideias ao texto já existente?')) return;
+        onUpd({ texto: (cap.texto && cap.texto.trim() ? cap.texto.trim()+'\n\n' : '') + rascunho });
+      };
+
+      return (
+        <details className="bg-white rounded-2xl border border-brand-200 shadow-sm" data-anim>
+          <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-3 select-none">
+            <span className="font-serif text-lg text-brand-900 truncate">
+              <span className="text-brand-400 mr-1">{idx+1}.</span>{cap.titulo || '(novo capítulo)'}
+            </span>
+            <span className="flex items-center gap-2 shrink-0 text-sm text-brand-400">
+              <span>{vinculadas.length} ideia(s) · {palavras} palavras</span>
+              <span>▾</span>
+            </span>
+          </summary>
+
+          <div className="px-5 pb-5 space-y-3 border-t border-brand-100 pt-4">
+            <input className={campoCls} value={cap.titulo} onChange={e=>onUpd({titulo:e.target.value})} placeholder="Título do capítulo / tema" />
+            <input className={campoCls} value={cap.descricao||''} onChange={e=>onUpd({descricao:e.target.value})} placeholder="Descrição curta do tema (opcional)" />
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">Ideias deste tema</span>
+                <button onClick={onAbrirPicker} className="text-sm text-plum-600 hover:text-plum-700 font-medium">+ Vincular ideias</button>
+              </div>
+              {vinculadas.length===0
+                ? <p className="text-sm text-brand-400">Nenhuma ideia vinculada ainda.</p>
+                : <div className="flex flex-wrap gap-2">
+                    {vinculadas.map(i => (
+                      <span key={i.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-plum-50 text-plum-700 ring-1 ring-plum-200">
+                        {catById(i.categoria).emoji} {i.nome}
+                        <button onClick={()=>onUpd({ideiaIds: cap.ideiaIds.filter(x=>x!==i.id)})} className="text-plum-400 hover:text-plum-700">✕</button>
+                      </span>
+                    ))}
+                  </div>}
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">Texto do capítulo</span>
+                {vinculadas.length>0 && <button onClick={montarRascunho} className="text-sm text-plum-600 hover:text-plum-700 font-medium">✨ Montar rascunho das ideias</button>}
+              </div>
+              <textarea rows="8" className={campoCls + ' font-sans leading-relaxed'} value={cap.texto||''} onChange={e=>onUpd({texto:e.target.value})} placeholder="Escreva aqui o conteúdo do capítulo..." />
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              <button onClick={()=>onMover(-1)} disabled={idx===0} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm disabled:opacity-40">↑ Subir</button>
+              <button onClick={()=>onMover(1)} disabled={idx===total-1} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm disabled:opacity-40">↓ Descer</button>
+              <button onClick={onRemover} className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition text-sm ml-auto">Excluir capítulo</button>
+            </div>
+          </div>
+        </details>
+      );
+    }
+
+    /* ============================== ABA LIVRO ============================== */
+
+    function LivroTab({ livros, setLivros, ideias, toast, abrir }) {
+      const [selId, setSelId] = useState(livros[0]?.id || null);
+      const [picker, setPicker] = useState(null); // capId
+      const [verExport, setVerExport] = useState(false);
+      const capaRef = useRef();
+      useEffect(() => { if (abrir && abrir.n && abrir.id) setSelId(abrir.id); }, [abrir && abrir.n]);
+      const livro = livros.find(l => l.id===selId) || null;
+
+      const novoLivro = () => {
+        const l = { id:uid(), titulo:'Meu novo livro', subtitulo:'', autor:'Jéssica Palin', sinopse:'', capitulos:[] };
+        setLivros(s => [l, ...s]); setSelId(l.id);
+      };
+      const updLivro = (patch) => setLivros(s => s.map(l => l.id===selId ? {...l, ...patch} : l));
+      const excluirLivro = (id) => { if(confirm('Excluir este livro?')){ setLivros(s=>s.filter(l=>l.id!==id)); if(selId===id) setSelId(null); } };
+
+      const updCap = (capId, patch) => setLivros(s => s.map(l => l.id!==selId ? l : {...l, capitulos: l.capitulos.map(c => c.id===capId ? {...c, ...patch} : c)}));
+      const addCap = () => updLivro({ capitulos: [...livro.capitulos, { id:uid(), titulo:'', descricao:'', ideiaIds:[], texto:'' }] });
+      const removerCap = (capId) => { if(confirm('Excluir este capítulo?')) updLivro({ capitulos: livro.capitulos.filter(c=>c.id!==capId) }); };
+      const moverCap = (capId, dir) => {
+        const arr = [...livro.capitulos];
+        const i = arr.findIndex(c=>c.id===capId);
+        const j = i+dir;
+        if (j<0 || j>=arr.length) return;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        updLivro({ capitulos: arr });
+      };
+
+      const gerarPor = (modo) => {
+        let grupos;
+        if (modo==='categoria') {
+          grupos = CATEGORIAS.map(c => ({titulo:c.curto, itens: ideias.filter(i=>i.categoria===c.id)})).filter(g=>g.itens.length);
+        } else {
+          const projs = Array.from(new Set(ideias.map(i=>i.projeto).filter(Boolean))).sort();
+          grupos = projs.map(p => ({titulo:p, itens: ideias.filter(i=>i.projeto===p)})).filter(g=>g.itens.length);
+        }
+        if (!grupos.length) { toast('Nenhuma ideia para agrupar'); return; }
+        const existentes = new Set(livro.capitulos.map(c=>(c.titulo||'').toLowerCase()));
+        const novos = grupos
+          .filter(g => !existentes.has(g.titulo.toLowerCase()))
+          .map(g => ({ id:uid(), titulo:g.titulo, descricao:'', ideiaIds:g.itens.map(i=>i.id), texto:'' }));
+        if (!novos.length) { toast('Os capítulos já existem'); return; }
+        updLivro({ capitulos: [...livro.capitulos, ...novos] });
+        toast(`${novos.length} capítulo(s) criado(s) ✓`);
+      };
+
+      const baixarTxtLivro = () => {
+        const blob = new Blob([textoLivro(livro, ideias)], {type:'text/plain;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = (livro.titulo||'livro').replace(/[\\/:|]/g,'-').trim() + '.txt';
+        a.click(); URL.revokeObjectURL(url);
+        toast('Livro .txt baixado ✓');
+      };
+
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+
+      // ----- Lista de livros -----
+      if (!livro) {
+        return (
+          <div data-anim>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="font-serif text-2xl text-brand-900">Produção de Livro</h2>
+                <p className="text-sm text-brand-600">Organize as ideias da sua central em capítulos e publique.</p>
+              </div>
+              <button onClick={novoLivro} className="bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl transition shadow-sm">+ Novo livro</button>
+            </div>
+            {livros.length===0 ? (
+              <div className="text-center py-20 text-brand-500">
+                <p className="font-serif text-2xl mb-2">Nenhum livro ainda</p>
+                <p className="text-sm">Clique em <strong>+ Novo livro</strong> para começar a montar seu primeiro livro.</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {livros.map(l => {
+                  const ct = l.capitulos.filter(c=>contarPalavras(c.texto)>0).length;
+                  const pc = l.capitulos.length ? Math.round(ct/l.capitulos.length*100) : 0;
+                  return (
+                  <div key={l.id} className="bg-white rounded-2xl border border-brand-200 p-5 shadow-sm hover:shadow-md transition">
+                    <div className="text-3xl mb-2">📖</div>
+                    <h3 className="font-serif text-lg text-brand-900">{l.titulo||'Sem título'}</h3>
+                    {l.subtitulo && <p className="text-sm text-brand-600 mt-0.5">{l.subtitulo}</p>}
+                    <p className="text-xs text-brand-400 mt-2">{l.capitulos.length} capítulo(s) · {pc}% escrito</p>
+                    {l.capitulos.length>0 &&
+                      <div className="h-1.5 rounded-full bg-brand-100 overflow-hidden mt-1.5">
+                        <div className="h-full bg-plum-600 rounded-full" style={{width:pc+'%'}}></div>
+                      </div>}
+                    <div className="mt-4 flex gap-2">
+                      <button onClick={()=>setSelId(l.id)} className="flex-1 bg-plum-600 hover:bg-plum-700 text-white font-medium py-2 rounded-lg transition text-sm">Abrir</button>
+                      <button onClick={()=>excluirLivro(l.id)} className="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition text-sm">Excluir</button>
+                    </div>
+                  </div>
+                  ); })}
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // ----- Editor do livro -----
+      const totalIdeias = new Set(livro.capitulos.flatMap(c=>c.ideiaIds||[])).size;
+      const totalPalavras = livro.capitulos.reduce((s,c)=>s+contarPalavras(c.texto),0);
+      const capsComTexto = livro.capitulos.filter(c=>contarPalavras(c.texto)>0).length;
+      const pctProgresso = livro.capitulos.length ? Math.round(capsComTexto/livro.capitulos.length*100) : 0;
+
+      return (
+        <div data-anim>
+          <button onClick={()=>setSelId(null)} className="text-sm text-brand-500 hover:text-brand-800 mb-4">← Voltar aos livros</button>
+
+          {/* CAPA / METADADOS */}
+          <div className="bg-white rounded-2xl border border-brand-200 shadow-sm p-5 mb-5 space-y-3">
+            <input className={campoCls + ' font-serif text-xl'} value={livro.titulo} onChange={e=>updLivro({titulo:e.target.value})} placeholder="Título do livro" />
+            <div className="grid sm:grid-cols-2 gap-3">
+              <input className={campoCls} value={livro.subtitulo||''} onChange={e=>updLivro({subtitulo:e.target.value})} placeholder="Subtítulo" />
+              <input className={campoCls} value={livro.autor||''} onChange={e=>updLivro({autor:e.target.value})} placeholder="Autor(a)" />
+            </div>
+            <textarea rows="2" className={campoCls} value={livro.sinopse||''} onChange={e=>updLivro({sinopse:e.target.value})} placeholder="Sinopse / apresentação do livro" />
+            <div className="flex items-center gap-4">
+              {livro.capa
+                ? <img src={livro.capa} alt="Capa" className="h-24 w-18 object-cover rounded-lg border border-brand-200" style={{width:'4.5rem'}} />
+                : <div className="h-24 rounded-lg border border-dashed border-brand-300 flex items-center justify-center text-3xl text-brand-300" style={{width:'4.5rem'}}>📕</div>}
+              <div className="flex flex-wrap gap-2">
+                <input ref={capaRef} type="file" accept="image/*" className="hidden"
+                  onChange={async e => { const f=e.target.files[0]; if(!f) return; try{ const d=await lerImagemRedimensionada(f,1000); updLivro({capa:d}); toast('Capa atualizada ✓'); }catch{ toast('Não foi possível ler a imagem'); } e.target.value=''; }} />
+                <button onClick={()=>capaRef.current.click()} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">🖼️ {livro.capa?'Trocar capa':'Adicionar capa'}</button>
+                {livro.capa && <button onClick={()=>updLivro({capa:''})} className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition text-sm">Remover capa</button>}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4 text-sm text-brand-500 pt-1">
+              <span><strong className="text-brand-800">{livro.capitulos.length}</strong> capítulos</span>
+              <span><strong className="text-brand-800">{totalIdeias}</strong> ideias usadas</span>
+              <span><strong className="text-brand-800">{totalPalavras}</strong> palavras</span>
+            </div>
+            {livro.capitulos.length>0 &&
+              <div className="pt-1">
+                <div className="flex justify-between text-xs text-brand-500 mb-1">
+                  <span>Progresso do livro</span>
+                  <span>{capsComTexto}/{livro.capitulos.length} capítulos escritos · {pctProgresso}%</span>
+                </div>
+                <div className="h-2.5 rounded-full bg-brand-100 overflow-hidden">
+                  <div className="h-full bg-plum-600 rounded-full transition-all" style={{width:pctProgresso+'%'}}></div>
+                </div>
+              </div>}
+          </div>
+
+          {/* AÇÕES */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            <button onClick={addCap} className="bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl transition shadow-sm text-sm">+ Novo capítulo</button>
+            <button onClick={()=>gerarPor('categoria')} className="px-4 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">⚡ Gerar capítulos por categoria</button>
+            <button onClick={()=>gerarPor('projeto')} className="px-4 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">⚡ Gerar por projeto</button>
+            <button onClick={()=>setVerExport(true)} className="px-4 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm ml-auto">📄 Exportar livro</button>
+          </div>
+
+          {/* CAPÍTULOS */}
+          {livro.capitulos.length===0 ? (
+            <div className="text-center py-16 text-brand-500">
+              <p className="font-serif text-xl mb-2">Nenhum capítulo ainda</p>
+              <p className="text-sm">Crie capítulos manualmente ou use <strong>Gerar capítulos por categoria</strong> para organizar tudo de uma vez.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {livro.capitulos.map((c,idx) => (
+                <CapituloBlock key={c.id} cap={c} idx={idx} total={livro.capitulos.length} ideias={ideias}
+                  onUpd={(patch)=>updCap(c.id, patch)}
+                  onRemover={()=>removerCap(c.id)}
+                  onMover={(dir)=>moverCap(c.id, dir)}
+                  onAbrirPicker={()=>setPicker(c.id)} />
+              ))}
+            </div>
+          )}
+
+          {/* PICKER DE IDEIAS */}
+          {picker && (() => {
+            const cap = livro.capitulos.find(c=>c.id===picker);
+            return (
+              <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setPicker(null)}>
+                <div className="bg-brand-50 rounded-2xl shadow-2xl max-w-2xl w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+                  <h2 className="font-serif text-2xl text-brand-900 mb-1">Vincular ideias</h2>
+                  <p className="text-sm text-brand-600 mb-4">Capítulo: <strong>{cap.titulo||'(sem título)'}</strong></p>
+                  {ideias.length===0 ? (
+                    <p className="text-sm text-brand-500 py-8 text-center">Você ainda não tem ideias na central.</p>
+                  ) : (
+                    <div className="space-y-2 max-h-[55vh] overflow-auto pr-1">
+                      {ideias.map(i => {
+                        const marcada = (cap.ideiaIds||[]).includes(i.id);
+                        return (
+                          <button key={i.id}
+                            onClick={()=>updCap(cap.id, { ideiaIds: marcada ? cap.ideiaIds.filter(x=>x!==i.id) : [...(cap.ideiaIds||[]), i.id] })}
+                            className={`w-full text-left flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${marcada?'border-plum-400 bg-plum-50':'border-brand-200 bg-white hover:border-plum-300'}`}>
+                            <span className={`w-5 h-5 rounded-md ring-1 flex items-center justify-center text-xs ${marcada?'bg-plum-600 text-white ring-plum-600':'ring-brand-300'}`}>{marcada?'✓':''}</span>
+                            <span className="text-sm text-brand-800 truncate">{catById(i.categoria).emoji} {i.nome}</span>
+                            <span className="text-xs text-brand-400 ml-auto shrink-0">{i.projeto||catById(i.categoria).curto}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <button onClick={()=>setPicker(null)} className="mt-4 w-full bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Concluir</button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* EXPORTAR LIVRO */}
+          {verExport && (
+            <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setVerExport(false)}>
+              <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+                <h2 className="font-serif text-2xl text-brand-900 mb-4">Exportar livro</h2>
+                <div id="folha-impressao" className="border border-brand-200 rounded-xl p-6 mb-4 bg-white max-h-[60vh] overflow-auto">
+                  <ManuscritoImpressao livro={livro} ideias={ideias} />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button onClick={()=>window.print()} className="flex-1 min-w-[140px] bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Salvar como PDF</button>
+                  <button onClick={baixarTxtLivro} className="px-5 py-2.5 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Baixar .txt</button>
+                  <button onClick={()=>setVerExport(false)} className="px-4 py-2.5 rounded-xl text-brand-500 hover:bg-brand-100 transition">Fechar</button>
+                </div>
+                <p className="mt-3 text-xs text-brand-400">Para PDF: na janela de impressão escolha “Salvar como PDF / Destino: PDF”. Para <strong>numeração de páginas</strong>, ative <strong>“Cabeçalhos e rodapés”</strong> em “Mais configurações”. A capa fica em página separada do conteúdo.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ============================== ENVIAR IDEIA P/ LIVRO ============================== */
+
+    function EnviarLivroModal({ ideia, livros, setLivros, onFechar, toast }) {
+      const [livroId, setLivroId] = useState(livros[0]?.id || '');
+      const livro = livros.find(l => l.id===livroId) || null;
+      const [capId, setCapId] = useState(livro?.capitulos[0]?.id || '__novo');
+      const [novoTitulo, setNovoTitulo] = useState(ideia.nome);
+
+      useEffect(() => {
+        const l = livros.find(x => x.id===livroId);
+        setCapId(l?.capitulos[0]?.id || '__novo');
+      }, [livroId]);
+
+      const criarLivro = () => {
+        const l = { id:uid(), titulo:'Meu novo livro', subtitulo:'', autor:'Jéssica Palin', sinopse:'', capa:'', capitulos:[] };
+        setLivros(s => [l, ...s]); setLivroId(l.id);
+      };
+
+      const confirmar = () => {
+        setLivros(s => s.map(l => {
+          if (l.id!==livroId) return l;
+          let caps;
+          if (capId==='__novo') {
+            caps = [...l.capitulos, { id:uid(), titulo:(novoTitulo||ideia.nome), descricao:'', ideiaIds:[ideia.id], texto:'' }];
+          } else {
+            caps = l.capitulos.map(c => c.id===capId
+              ? {...c, ideiaIds: (c.ideiaIds||[]).includes(ideia.id) ? c.ideiaIds : [...(c.ideiaIds||[]), ideia.id]}
+              : c);
+          }
+          return {...l, capitulos: caps};
+        }));
+        toast('Ideia enviada ao livro ✓');
+        onFechar();
+      };
+
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+      const label = "block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5";
+
+      return (
+        <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={onFechar}>
+          <div className="bg-brand-50 rounded-2xl shadow-2xl max-w-md w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+            <h2 className="font-serif text-2xl text-brand-900 mb-1">Enviar para livro</h2>
+            <p className="text-sm text-brand-600 mb-4">Ideia: <strong>{ideia.nome}</strong></p>
+
+            {livros.length===0 ? (
+              <div className="text-center py-6">
+                <p className="text-sm text-brand-500 mb-4">Você ainda não tem nenhum livro.</p>
+                <button onClick={criarLivro} className="bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl transition">+ Criar um livro agora</button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className={label}>Livro</label>
+                  <div className="flex gap-2">
+                    <select value={livroId} onChange={e=>setLivroId(e.target.value)} className={campoCls}>
+                      {livros.map(l => <option key={l.id} value={l.id}>{l.titulo||'(sem título)'}</option>)}
+                    </select>
+                    <button onClick={criarLivro} className="shrink-0 px-3 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">+ Novo</button>
+                  </div>
+                </div>
+                <div>
+                  <label className={label}>Capítulo</label>
+                  <select value={capId} onChange={e=>setCapId(e.target.value)} className={campoCls}>
+                    {(livro?.capitulos||[]).map(c => <option key={c.id} value={c.id}>{c.titulo||'(sem título)'}</option>)}
+                    <option value="__novo">➕ Criar novo capítulo</option>
+                  </select>
+                </div>
+                {capId==='__novo' &&
+                  <div>
+                    <label className={label}>Título do novo capítulo</label>
+                    <input className={campoCls} value={novoTitulo} onChange={e=>setNovoTitulo(e.target.value)} placeholder="Ex.: nome do tema" />
+                  </div>}
+                <div className="flex gap-3 pt-1">
+                  <button onClick={confirmar} className="flex-1 bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Enviar</button>
+                  <button onClick={onFechar} className="px-4 py-2.5 rounded-xl text-brand-500 hover:bg-brand-100 transition">Cancelar</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================== REFERÊNCIAS ============================== */
+
+    function ReferenciaForm({ inicial, onSalvar, onCancelar, ideias }) {
+      const [f, setF] = useState(inicial || {
+        tipo:'Livro', titulo:'', autor:'', ano:'', fonte:'', link:'', trecho:'', notas:'',
+        categoria:CATEGORIAS[0].id, tags:[], ideiaIds:[], anexo:null
+      });
+      const [tagsText, setTagsText] = useState((inicial?.tags||[]).join(', '));
+      const fileRef = useRef();
+      const set = (k,v) => setF(s => ({...s, [k]:v}));
+      const toggle = (k,v) => setF(s => ({...s, [k]: s[k].includes(v) ? s[k].filter(x=>x!==v) : [...s[k], v]}));
+
+      const escolherArquivo = async (file) => {
+        if (!file) return;
+        if (file.size > 80*1024*1024) { alert('Arquivo muito grande (máximo ~80 MB).'); return; }
+        const id = uid();
+        try { await idbSet(id, file); set('anexo', { id, nome:file.name, tipo:file.type, tamanho:file.size }); }
+        catch { alert('Não foi possível anexar o arquivo.'); }
+      };
+
+      const submit = () => {
+        if (!f.titulo.trim()) { alert('Dê um título à referência.'); return; }
+        const tags = tagsText.split(',').map(t=>t.trim()).filter(Boolean);
+        onSalvar({ ...f, tags });
+      };
+
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+      const label = "block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5";
+      const pill = (on) => `text-xs px-2.5 py-1 rounded-full ring-1 transition ${on?'bg-plum-600 text-white ring-plum-600':'bg-white text-brand-600 ring-brand-200 hover:ring-plum-300'}`;
+
+      return (
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Tipo</label>
+              <select className={campoCls} value={f.tipo} onChange={e=>set('tipo',e.target.value)}>
+                {TIPOS_REF.map(t => <option key={t} value={t}>{iconeRef(t)} {t}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={label}>Categoria</label>
+              <select className={campoCls} value={f.categoria} onChange={e=>set('categoria',e.target.value)}>
+                {CATEGORIAS.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.curto}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className={label}>Título *</label>
+            <input className={campoCls} value={f.titulo} onChange={e=>set('titulo',e.target.value)} placeholder="Título do livro, artigo ou texto" />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Autor(es)</label>
+              <input className={campoCls} value={f.autor} onChange={e=>set('autor',e.target.value)} placeholder="Ex.: Reuven Feuerstein" />
+            </div>
+            <div>
+              <label className={label}>Ano</label>
+              <input className={campoCls} value={f.ano} onChange={e=>set('ano',e.target.value)} placeholder="Ex.: 2014" />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={label}>Fonte (editora / revista / site)</label>
+              <input className={campoCls} value={f.fonte} onChange={e=>set('fonte',e.target.value)} placeholder="Ex.: Editora Vozes" />
+            </div>
+            <div>
+              <label className={label}>Link / URL</label>
+              <input className={campoCls} value={f.link} onChange={e=>set('link',e.target.value)} placeholder="https://..." />
+            </div>
+          </div>
+
+          <div>
+            <label className={label}>Trecho / citação importante</label>
+            <textarea rows="3" className={campoCls} value={f.trecho} onChange={e=>set('trecho',e.target.value)} placeholder="Cole aqui um trecho ou citação que você quer guardar." />
+          </div>
+
+          <div>
+            <label className={label}>Notas / por que é útil</label>
+            <textarea rows="2" className={campoCls} value={f.notas} onChange={e=>set('notas',e.target.value)} placeholder="Suas anotações sobre esta referência." />
+          </div>
+
+          <div>
+            <label className={label}>Etiquetas (separadas por vírgula)</label>
+            <input className={campoCls} value={tagsText} onChange={e=>setTagsText(e.target.value)} placeholder="Ex.: mediação, aprendizagem, liderança" />
+          </div>
+
+          <div>
+            <label className={label}>Arquivo anexado (PDF, DOCX, imagem...)</label>
+            <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt,.rtf,.epub,image/*" className="hidden"
+              onChange={e=>{ const file=e.target.files[0]; escolherArquivo(file); e.target.value=''; }} />
+            {f.anexo ? (
+              <div className="flex items-center gap-2 rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm">
+                <span className="truncate">📎 {f.anexo.nome} <span className="text-brand-400">({formatarTamanho(f.anexo.tamanho)})</span></span>
+                <div className="ml-auto flex gap-3 shrink-0">
+                  <button type="button" onClick={()=>abrirAnexo(f.anexo, ()=>alert('Arquivo não encontrado.'))} className="text-plum-600 hover:text-plum-700 font-medium">Abrir</button>
+                  <button type="button" onClick={()=>fileRef.current.click()} className="text-brand-600 hover:text-brand-800 font-medium">Trocar</button>
+                  <button type="button" onClick={()=>set('anexo', null)} className="text-red-500 hover:text-red-700 font-medium">Remover</button>
+                </div>
+              </div>
+            ) : (
+              <button type="button" onClick={()=>fileRef.current.click()} className="px-3 py-2 rounded-xl border border-dashed border-brand-300 text-brand-600 hover:bg-brand-100 transition text-sm">📎 Anexar arquivo</button>
+            )}
+            <p className="mt-1 text-xs text-brand-400">O arquivo fica salvo neste navegador (não entra no backup .json).</p>
+          </div>
+
+          <div>
+            <label className={label}>Ideias que vão usar esta referência</label>
+            {ideias.length===0
+              ? <p className="text-sm text-brand-400">Você ainda não tem ideias na central.</p>
+              : <div className="flex flex-wrap gap-2 max-h-40 overflow-auto p-1">
+                  {ideias.map(i => (
+                    <button type="button" key={i.id} onClick={()=>toggle('ideiaIds', i.id)} className={pill(f.ideiaIds.includes(i.id))}>
+                      {catById(i.categoria).emoji} {i.nome}
+                    </button>
+                  ))}
+                </div>}
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button onClick={submit} className="flex-1 bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Salvar referência</button>
+            <button onClick={onCancelar} className="px-5 py-2.5 rounded-xl text-brand-500 hover:bg-brand-100 transition">Cancelar</button>
+          </div>
+        </div>
+      );
+    }
+
+    function ReferenciaCard({ referencia, ideias, onEditar, onExcluir, copiar, toast, onPreview }) {
+      const r = referencia;
+      const cat = catById(r.categoria);
+      const ligadas = (r.ideiaIds||[]).map(id => ideias.find(i=>i.id===id)).filter(Boolean);
+      return (
+        <div className="bg-white rounded-2xl border border-brand-200 p-5 shadow-sm hover:shadow-md transition flex flex-col" data-anim>
+          <div className="flex items-center gap-2 text-xs text-brand-500 mb-1">
+            <span>{iconeRef(r.tipo)} {r.tipo}</span>
+            <span>·</span>
+            <span>{cat.emoji} {cat.curto}</span>
+          </div>
+          <h3 className="font-serif text-lg leading-snug text-brand-900 break-words">{r.titulo}</h3>
+          {(r.autor || r.ano || r.fonte) &&
+            <p className="text-sm text-brand-600 mt-0.5">{[r.autor, r.ano, r.fonte].filter(Boolean).join(' · ')}</p>}
+
+          {r.trecho && <p className="mt-3 text-sm text-brand-700 italic border-l-2 border-plum-200 pl-3 line-clamp-4">“{r.trecho}”</p>}
+          {r.notas && <p className="mt-2 text-sm text-brand-600 line-clamp-3">{r.notas}</p>}
+
+          {(r.tags||[]).length>0 &&
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {r.tags.map(t => <Pill key={t} className="bg-brand-100 text-brand-600 ring-brand-200">#{t}</Pill>)}
+            </div>}
+
+          {ligadas.length>0 &&
+            <div className="mt-3 text-xs text-brand-600 bg-plum-50/60 border border-plum-100 rounded-lg px-3 py-2">
+              <span className="font-semibold">Usada em:</span> {ligadas.map(i=>i.nome).join('; ')}
+            </div>}
+
+          {r.anexo &&
+            <div className="mt-3 text-xs text-brand-600 flex items-center gap-2">
+              <span className="truncate">📎 {r.anexo.nome} <span className="text-brand-400">({formatarTamanho(r.anexo.tamanho)})</span></span>
+            </div>}
+
+          <div className="mt-auto pt-4 flex flex-wrap gap-2 text-sm">
+            {r.link && <a href={r.link} target="_blank" rel="noopener" className="px-3 py-2 rounded-lg bg-plum-600 hover:bg-plum-700 text-white font-medium transition">Abrir link</a>}
+            {r.anexo && <button onClick={()=>onPreview(r.anexo)} className="px-3 py-2 rounded-lg border border-plum-300 text-plum-700 hover:bg-plum-50 transition font-medium">📎 Abrir arquivo</button>}
+            <button onClick={()=>copiar(citacaoRef(r), ()=>toast('Citação copiada ✓'))} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">Copiar citação</button>
+            <button onClick={()=>onEditar(r)} className="px-3 py-2 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition">Editar</button>
+            <button onClick={()=>onExcluir(r)} className="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition">Excluir</button>
+          </div>
+        </div>
+      );
+    }
+
+    function VisualizadorAnexo({ anexo, onFechar }) {
+      const [url, setUrl] = useState(null);
+      const [erro, setErro] = useState(false);
+      useEffect(() => {
+        let u;
+        idbGet(anexo.id).then(blob => {
+          if (!blob) { setErro(true); return; }
+          u = URL.createObjectURL(blob); setUrl(u);
+        }).catch(() => setErro(true));
+        return () => { if (u) URL.revokeObjectURL(u); };
+      }, [anexo.id]);
+
+      const ehImg = (anexo.tipo||'').startsWith('image/');
+      const ehPdf = (anexo.tipo||'').includes('pdf') || /\.pdf$/i.test(anexo.nome||'');
+      const baixar = () => { if (!url) return; const a=document.createElement('a'); a.href=url; a.download=anexo.nome; document.body.appendChild(a); a.click(); a.remove(); };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-brand-900/60 backdrop-blur-sm flex flex-col p-4" onClick={onFechar}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-auto my-2 flex flex-col flex-1 overflow-hidden" onClick={e=>e.stopPropagation()} data-anim>
+            <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-brand-200">
+              <span className="font-serif text-lg text-brand-900 truncate">📎 {anexo.nome} <span className="text-sm text-brand-400">({formatarTamanho(anexo.tamanho)})</span></span>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={baixar} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">Baixar</button>
+                {url && <a href={url} target="_blank" rel="noopener" className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">Nova aba</a>}
+                <button onClick={onFechar} className="px-3 py-1.5 rounded-lg bg-brand-900 text-white hover:bg-brand-800 transition text-sm">Fechar</button>
+              </div>
+            </div>
+            <div className="flex-1 bg-brand-100 overflow-auto flex items-center justify-center">
+              {erro ? <p className="text-sm text-brand-500 p-8">Arquivo não encontrado neste navegador.</p>
+               : !url ? <p className="text-sm text-brand-500 p-8">Carregando…</p>
+               : ehImg ? <img src={url} alt={anexo.nome} className="max-w-full max-h-full object-contain" />
+               : ehPdf ? <iframe src={url} title={anexo.nome} className="w-full h-full" style={{border:'none'}} />
+               : <div className="text-center p-8 text-brand-600">
+                   <p className="mb-3">Este tipo de arquivo não pode ser pré-visualizado aqui (ex.: DOCX).</p>
+                   <button onClick={baixar} className="bg-plum-600 hover:bg-plum-700 text-white font-medium px-4 py-2 rounded-xl transition">Baixar arquivo</button>
+                 </div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ReferenciasTab({ refs, setRefs, ideias, copiar, toast, filtroIdeia, setFiltroIdeia, seed }) {
+      const [modal, setModal] = useState(null); // null | 'nova' | referencia
+      const [busca, setBusca] = useState('');
+      useEffect(() => { if (seed && seed.n) setBusca(seed.q); }, [seed && seed.n]);
+      const [filtroTipo, setFiltroTipo] = useState('todos');
+      const [filtroCat, setFiltroCat] = useState('todas');
+      const [preview, setPreview] = useState(null); // anexo em pré-visualização
+
+      const salvarRef = (dados) => {
+        if (dados.id) setRefs(s => s.map(r => r.id===dados.id ? dados : r));
+        else setRefs(s => [{...dados, id:uid(), criadoEm:Date.now()}, ...s]);
+        setModal(null);
+        toast('Referência salva ✓');
+      };
+      const excluir = (r) => { if (confirm('Excluir esta referência?')) { if (r.anexo) idbDel(r.anexo.id); setRefs(s => s.filter(x=>x.id!==r.id)); } };
+
+      const ideiaFiltro = filtroIdeia ? ideias.find(i=>i.id===filtroIdeia) : null;
+
+      const filtradas = useMemo(() => refs
+        .filter(r => !filtroIdeia || (r.ideiaIds||[]).includes(filtroIdeia))
+        .filter(r => filtroTipo==='todos' || r.tipo===filtroTipo)
+        .filter(r => filtroCat==='todas' || r.categoria===filtroCat)
+        .filter(r => {
+          const q = busca.trim().toLowerCase();
+          if (!q) return true;
+          return [r.titulo,r.autor,r.fonte,r.trecho,r.notas,(r.tags||[]).join(' ')].join(' ').toLowerCase().includes(q);
+        }), [refs, filtroTipo, filtroCat, busca, filtroIdeia]);
+
+      return (
+        <div data-anim>
+          <div className="flex items-center justify-between mb-5 gap-3">
+            <div>
+              <h2 className="font-serif text-2xl text-brand-900">Referências</h2>
+              <p className="text-sm text-brand-600">Livros, artigos, textos e links que alimentam suas ideias.</p>
+            </div>
+            <button onClick={()=>setModal('nova')} className="shrink-0 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl transition shadow-sm">+ Nova referência</button>
+          </div>
+
+          {ideiaFiltro &&
+            <div className="mb-4 inline-flex items-center gap-2 text-sm bg-plum-50 border border-plum-200 text-plum-800 rounded-xl px-3 py-2">
+              📚 Referências da ideia: <strong>{ideiaFiltro.nome}</strong>
+              <button onClick={()=>setFiltroIdeia(null)} className="ml-1 text-plum-500 hover:text-plum-700">✕ limpar</button>
+            </div>}
+
+          <div className="flex flex-wrap gap-3 mb-6 items-center">
+            <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="🔍 Buscar por título, autor, trecho..."
+              className="flex-1 min-w-[200px] rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300" />
+            <select value={filtroTipo} onChange={e=>setFiltroTipo(e.target.value)} className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+              <option value="todos">Todos os tipos</option>
+              {TIPOS_REF.map(t => <option key={t} value={t}>{iconeRef(t)} {t}</option>)}
+            </select>
+            <select value={filtroCat} onChange={e=>setFiltroCat(e.target.value)} className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+              <option value="todas">Todas as categorias</option>
+              {CATEGORIAS.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.curto}</option>)}
+            </select>
+          </div>
+
+          {filtradas.length===0 ? (
+            <div className="text-center py-20 text-brand-500">
+              <p className="font-serif text-2xl mb-2">Nenhuma referência aqui</p>
+              <p className="text-sm">Clique em <strong>+ Nova referência</strong> para guardar um livro, artigo ou texto.</p>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {filtradas.map(r => (
+                <ReferenciaCard key={r.id} referencia={r} ideias={ideias} copiar={copiar} toast={toast}
+                  onEditar={setModal} onExcluir={excluir} onPreview={setPreview} />
+              ))}
+            </div>
+          )}
+
+          {modal && (
+            <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setModal(null)}>
+              <div className="bg-brand-50 rounded-2xl shadow-2xl max-w-2xl w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+                <h2 className="font-serif text-2xl text-brand-900 mb-5">{modal==='nova'?'Nova referência':'Editar referência'}</h2>
+                <ReferenciaForm inicial={modal==='nova'?null:modal} onSalvar={salvarRef} onCancelar={()=>setModal(null)} ideias={ideias} />
+              </div>
+            </div>
+          )}
+
+          {preview && <VisualizadorAnexo anexo={preview} onFechar={()=>setPreview(null)} />}
+        </div>
+      );
+    }
+
+    /* ============================== BUSCA GLOBAL ============================== */
+
+    function Realce({ texto, termo }) {
+      const t = texto || '';
+      const q = (termo||'').trim();
+      if (!q) return t;
+      const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const partes = t.split(new RegExp(`(${esc})`, 'ig'));
+      return partes.map((p,i) => p.toLowerCase()===q.toLowerCase()
+        ? <mark key={i} className="rounded px-0.5 font-semibold" style={{background:'rgba(173,126,205,.38)', color:'inherit'}}>{p}</mark>
+        : p);
+    }
+
+    function BuscaGlobal({ ideias, refs, livros, onFechar, onIrIdeia, onIrRef, onIrLivro }) {
+      const [q, setQ] = useState('');
+      const termo = q.trim().toLowerCase();
+
+      useEffect(() => {
+        const onKey = (e) => { if (e.key === 'Escape') onFechar(); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, []);
+
+      const res = useMemo(() => {
+        if (!termo) return { ideias:[], refs:[], livros:[] };
+        const m = (...campos) => campos.filter(Boolean).join(' ').toLowerCase().includes(termo);
+        const ri = ideias.filter(i => m(i.nome,i.problema,i.publico,i.proximo,i.projeto,i.notas,(i.formatos||[]).join(' '),(i.conexoes||[]).join(' '))).slice(0,8);
+        const rr = refs.filter(r => m(r.titulo,r.autor,r.fonte,r.trecho,r.notas,(r.tags||[]).join(' '))).slice(0,8);
+        const rl = [];
+        livros.forEach(l => {
+          if (m(l.titulo,l.subtitulo,l.autor,l.sinopse)) rl.push({ livro:l, cap:null });
+          (l.capitulos||[]).forEach(c => { if (m(c.titulo,c.descricao,c.texto)) rl.push({ livro:l, cap:c }); });
+        });
+        return { ideias:ri, refs:rr, livros:rl.slice(0,8) };
+      }, [termo, ideias, refs, livros]);
+
+      const total = res.ideias.length + res.refs.length + res.livros.length;
+      const grupoCls = "text-xs font-semibold uppercase tracking-wide text-brand-500 px-3 pt-3 pb-1";
+      const itemCls = "w-full text-left px-3 py-2.5 rounded-xl hover:bg-plum-50 transition flex items-start gap-2.5";
+
+      return (
+        <div className="fixed inset-0 z-50 bg-brand-900/50 backdrop-blur-sm flex items-start justify-center p-4" onClick={onFechar}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full mt-[8vh] overflow-hidden" onClick={e=>e.stopPropagation()} data-anim>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-brand-200">
+              <span className="text-brand-400">🔍</span>
+              <input autoFocus value={q} onChange={e=>setQ(e.target.value)}
+                placeholder="Buscar em ideias, referências e livros..."
+                className="flex-1 bg-transparent text-sm focus:outline-none text-brand-900" />
+              <kbd className="text-[10px] text-brand-400 border border-brand-200 rounded px-1.5 py-0.5">Esc</kbd>
+            </div>
+
+            <div className="max-h-[60vh] overflow-auto pb-2">
+              {!termo ? (
+                <p className="text-sm text-brand-400 p-6 text-center">Digite para buscar em todo o seu acervo.</p>
+              ) : total===0 ? (
+                <p className="text-sm text-brand-400 p-6 text-center">Nada encontrado para “{q}”.</p>
+              ) : (
+                <>
+                  {res.ideias.length>0 && <div>
+                    <div className={grupoCls}>💡 Ideias</div>
+                    {res.ideias.map(i => (
+                      <button key={i.id} className={itemCls} onClick={()=>onIrIdeia(i)}>
+                        <span>{catById(i.categoria).emoji}</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm text-brand-900 truncate"><Realce texto={i.nome} termo={q} /></span>
+                          <span className="block text-xs text-brand-400 truncate">{catById(i.categoria).curto}{i.projeto?` · ${i.projeto}`:''}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>}
+
+                  {res.refs.length>0 && <div>
+                    <div className={grupoCls}>📚 Referências</div>
+                    {res.refs.map(r => (
+                      <button key={r.id} className={itemCls} onClick={()=>onIrRef(r)}>
+                        <span>{iconeRef(r.tipo)}</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm text-brand-900 truncate"><Realce texto={r.titulo} termo={q} /></span>
+                          <span className="block text-xs text-brand-400 truncate"><Realce texto={[r.autor,r.ano].filter(Boolean).join(' · ')||r.tipo} termo={q} /></span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>}
+
+                  {res.livros.length>0 && <div>
+                    <div className={grupoCls}>📖 Livros</div>
+                    {res.livros.map((x,idx) => (
+                      <button key={x.livro.id+'-'+(x.cap?x.cap.id:'capa')+idx} className={itemCls} onClick={()=>onIrLivro(x.livro.id)}>
+                        <span>{x.cap?'📄':'📘'}</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm text-brand-900 truncate"><Realce texto={x.cap ? x.cap.titulo || '(capítulo sem título)' : x.livro.titulo || '(livro sem título)'} termo={q} /></span>
+                          <span className="block text-xs text-brand-400 truncate">{x.cap ? `Capítulo de “${x.livro.titulo||'livro'}”` : 'Livro'}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================== CHAT MENTOR ============================== */
+
+    const SUGESTAO_PASSO = {
+      inicial:'Definir o tema central e o público em 1 frase',
+      pesquisa:'Levantar 3 referências e o conceito principal',
+      estruturada:'Escrever a primeira versão (esboço)',
+      pronta:'Agendar a publicação ou apresentação',
+      publicada:'',
+    };
+
+    function LinhaDefinirPasso({ ideia, onSalvar }) {
+      const [passo, setPasso] = useState(ideia.proximo || SUGESTAO_PASSO[ideia.nivel] || '');
+      const [prazo, setPrazo] = useState(ideia.prazo || emDias(7));
+      const campoCls = "rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+      return (
+        <div className="rounded-xl border border-brand-100 p-3">
+          <div className="text-sm font-medium text-brand-800 mb-2">{catById(ideia.categoria).emoji} {ideia.nome} <span className="text-xs text-brand-400">· {nivelById(ideia.nivel).nome}</span></div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input className={campoCls + ' flex-1'} value={passo} onChange={e=>setPasso(e.target.value)} placeholder="Próximo passo" />
+            <input type="date" className={campoCls} value={prazo} onChange={e=>setPrazo(e.target.value)} />
+            <button onClick={()=>{ if(!passo.trim()) return; onSalvar(ideia.id, passo.trim(), prazo); }} className="bg-plum-600 hover:bg-plum-700 text-white font-medium px-4 py-2 rounded-xl transition text-sm shrink-0">Definir</button>
+          </div>
+          {(!ideia.proximo || !ideia.prazo) && <p className="text-xs text-brand-400 mt-1">💡 Sugestão preenchida automaticamente — ajuste se quiser.</p>}
+        </div>
+      );
+    }
+
+    function ChatMentor({ ideias, setIdeias, toast }) {
+      const [mensagens, setMensagens] = useState(() => { try { return JSON.parse(localStorage.getItem('central_ideias_chat_v1')) || []; } catch { return []; } });
+      const [entrada, setEntrada] = useState('');
+      const [carregando, setCarregando] = useState(false);
+      const [verCfg, setVerCfg] = useState(false);
+      const [salvarNota, setSalvarNota] = useState(null); // {texto} | null
+      const [notaIdeiaId, setNotaIdeiaId] = useState(ideias[0]?.id || '');
+      const [cfg, setCfg] = useState(() => { try { return Object.assign({usarIA:false, key:'', model:'claude-3-5-sonnet-20241022'}, JSON.parse(localStorage.getItem('central_ideias_chat_cfg_v1'))||{}); } catch { return {usarIA:false, key:'', model:'claude-3-5-sonnet-20241022'}; } });
+      const fimRef = useRef();
+
+      useEffect(() => { try { localStorage.setItem('central_ideias_chat_v1', JSON.stringify(mensagens)); } catch {} }, [mensagens]);
+      useEffect(() => { try { localStorage.setItem('central_ideias_chat_cfg_v1', JSON.stringify(cfg)); } catch {} }, [cfg]);
+      useEffect(() => { if (fimRef.current) fimRef.current.scrollIntoView({behavior:'smooth'}); }, [mensagens, carregando]);
+
+      const ctx = () => ({
+        atrasados: ideias.filter(i=>i.prazo && i.nivel!=='publicada' && diffDias(i.prazo)<0).sort((a,b)=>a.prazo.localeCompare(b.prazo)),
+        totalIdeias: ideias.length,
+        paradas: ideias.filter(i=>i.nivel==='inicial').length,
+      });
+
+      const construirSistema = (c) => {
+        let dados = `Ela tem ${c.totalIdeias} ideia(s) no sistema, ${c.paradas} ainda em estágio inicial.`;
+        if (c.atrasados.length) dados += ` Próximos passos ATRASADOS (${c.atrasados.length}): ` + c.atrasados.slice(0,6).map(i=>`"${i.proximo||i.nome}" (${-diffDias(i.prazo)} dias, ideia: ${i.nome})`).join('; ') + '.';
+        else dados += ' Nenhum próximo passo atrasado no momento.';
+        return PERSONA_SISTEMA + '\n\nContexto atual (dados reais do app dela):\n' + dados;
+      };
+
+      const chamarIA = async (historico) => {
+        const msgs = historico.filter(m=>m.role==='user'||m.role==='assistant');
+        while (msgs.length && msgs[0].role!=='user') msgs.shift();
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method:'POST',
+          headers:{ 'content-type':'application/json', 'x-api-key':cfg.key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+          body: JSON.stringify({ model: cfg.model||'claude-3-5-sonnet-20241022', max_tokens:600, system: construirSistema(ctx()), messages: msgs.map(m=>({role:m.role, content:m.texto})) })
+        });
+        if (!resp.ok) throw new Error((await resp.text()).slice(0,160));
+        const data = await resp.json();
+        return (data.content||[]).map(c=>c.text).join('').trim() || '(sem resposta)';
+      };
+
+      const enviar = async (txt) => {
+        const t = (txt!==undefined ? txt : entrada).trim();
+        if (!t || carregando) return;
+        const novo = [...mensagens, {role:'user', texto:t}];
+        setMensagens(novo); setEntrada('');
+        if (cfg.usarIA && cfg.key) {
+          setCarregando(true);
+          try { const r = await chamarIA(novo); setMensagens(m=>[...m, {role:'assistant', texto:r}]); }
+          catch(e) { setMensagens(m=>[...m, {role:'assistant', texto:'⚠️ Não consegui falar com a IA ('+e.message+').\n\nSeguindo no modo local:\n\n'+mentorLocal(t, ctx(), novo.length)}]); }
+          finally { setCarregando(false); }
+        } else {
+          setMensagens(m=>[...m, {role:'assistant', texto: mentorLocal(t, ctx(), novo.length)}]);
+        }
+      };
+
+      const limpar = () => { if (confirm('Apagar toda a conversa?')) setMensagens([]); };
+      const chips = ['Estou enrolando em algo','Preciso decidir uma coisa','Uma pessoa me decepcionou','Me faça uma pergunta difícil','Reality check dos meus prazos'];
+
+      const semPasso = ideias.filter(i => i.nivel!=='publicada' && (!(i.proximo||'').trim() || !i.prazo));
+      const definirPasso = (id, passo, prazo) => { setIdeias(s => s.map(i => i.id===id ? {...i, proximo:passo, prazo} : i)); toast('Próximo passo definido ✓'); };
+
+      const confirmarNota = () => {
+        if (!notaIdeiaId) { toast('Escolha uma ideia'); return; }
+        const nova = { data: hojeISO(), texto: salvarNota.texto };
+        setIdeias(s => s.map(i => i.id===notaIdeiaId ? {...i, reflexoes: [...(i.reflexoes||[]), nova]} : i));
+        toast('Reflexão salva na ideia ✓');
+        setSalvarNota(null);
+      };
+      const modoIA = cfg.usarIA && cfg.key;
+      const campoCls = "w-full rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300";
+
+      return (
+        <div data-anim className="max-w-3xl mx-auto">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div>
+              <h2 className="font-serif text-2xl text-brand-900">🧭 Mentor</h2>
+              <p className="text-sm text-brand-600">Um chat pra te questionar, não pra te dar razão.</p>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button onClick={()=>setVerCfg(v=>!v)} className="px-3 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">⚙️ IA</button>
+              {mensagens.length>0 && <button onClick={limpar} className="px-3 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">🗑️</button>}
+            </div>
+          </div>
+
+          <p className="text-xs text-brand-400 mb-3">Modo atual: <strong className={modoIA?'text-plum-600':'text-brand-600'}>{modoIA?'IA conectada':'Coach local (offline)'}</strong></p>
+
+          {verCfg &&
+            <div className="bg-white border border-brand-200 rounded-2xl p-4 mb-3 space-y-3 text-sm" data-anim>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={cfg.usarIA} onChange={e=>setCfg(c=>({...c, usarIA:e.target.checked}))} />
+                <span>Usar IA (Anthropic) quando houver chave</span>
+              </label>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">Chave de API</label>
+                <input type="password" className={campoCls} value={cfg.key} onChange={e=>setCfg(c=>({...c, key:e.target.value}))} placeholder="sk-ant-..." />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">Modelo</label>
+                <input className={campoCls} value={cfg.model} onChange={e=>setCfg(c=>({...c, model:e.target.value}))} placeholder="claude-3-5-sonnet-20241022" />
+              </div>
+              <p className="text-xs text-brand-400">Sem chave, o Mentor funciona no modo coach local (offline e grátis). Com chave, as respostas ficam mais inteligentes (a Anthropic cobra por uso). Sua chave e suas conversas ficam só neste computador. A chave é criada em console.anthropic.com.</p>
+            </div>}
+
+          {semPasso.length>0 &&
+            <details className="bg-white border border-brand-200 rounded-2xl shadow-sm mb-3">
+              <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between select-none">
+                <span className="font-serif text-base text-brand-900">🎯 Ideias sem próximo passo definido</span>
+                <span className="text-sm text-brand-400">{semPasso.length} ▾</span>
+              </summary>
+              <div className="px-4 pb-4 space-y-3">
+                <p className="text-xs text-brand-500">Toda ideia precisa de uma próxima ação com prazo, senão vira intenção. Eu já sugeri uma — confirme ou ajuste:</p>
+                {semPasso.map(i => <LinhaDefinirPasso key={i.id} ideia={i} onSalvar={definirPasso} />)}
+              </div>
+            </details>}
+
+          <div className="bg-white border border-brand-200 rounded-2xl shadow-sm flex flex-col" style={{height:'62vh'}}>
+            <div className="flex-1 overflow-auto p-4 space-y-3">
+              {mensagens.length===0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <div className="text-4xl mb-2">🧭</div>
+                  <p className="font-serif text-xl text-brand-800 mb-1">Seu Mentor</p>
+                  <p className="text-sm text-brand-500 max-w-md">Não tô aqui pra concordar com você, Jéssica — tô aqui pra te fazer pensar e agir. Por onde começamos?</p>
+                  <div className="flex flex-wrap gap-2 justify-center mt-4">
+                    {chips.map(c => <button key={c} onClick={()=>enviar(c)} className="text-sm px-3 py-1.5 rounded-full border border-brand-200 text-brand-700 hover:bg-plum-50 hover:border-plum-300 transition">{c}</button>)}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {mensagens.map((m,i) => (
+                    <div key={i} className={`flex flex-col ${m.role==='user'?'items-end':'items-start'}`}>
+                      <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap leading-relaxed ${m.role==='user'?'bg-plum-600 text-white':'bg-brand-100 text-brand-800'}`}>{m.texto}</div>
+                      <button onClick={()=>{ setNotaIdeiaId(ideias[0]?.id||''); setSalvarNota({texto:m.texto}); }} title="Salvar como nota numa ideia" className="mt-1 text-[11px] text-brand-400 hover:text-plum-600 transition">📌 salvar como nota</button>
+                    </div>
+                  ))}
+                  {carregando && <div className="flex justify-start"><div className="bg-brand-100 text-brand-500 rounded-2xl px-4 py-2.5 text-sm">pensando…</div></div>}
+                </>
+              )}
+              <div ref={fimRef} />
+            </div>
+
+            <div className="border-t border-brand-200 p-3 flex gap-2 items-end">
+              <textarea rows="1" value={entrada} onChange={e=>setEntrada(e.target.value)}
+                onKeyDown={e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); enviar(); } }}
+                placeholder="Escreva aqui… (Enter envia, Shift+Enter quebra linha)"
+                className="flex-1 resize-none rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300" style={{maxHeight:'120px'}} />
+              <button onClick={()=>enviar()} disabled={carregando} className="bg-plum-600 hover:bg-plum-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-xl transition shrink-0">Enviar</button>
+            </div>
+          </div>
+
+          {salvarNota &&
+            <div className="fixed inset-0 z-50 bg-brand-900/50 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setSalvarNota(null)}>
+              <div className="bg-brand-50 rounded-2xl shadow-2xl max-w-md w-full mt-[10vh] p-6" onClick={e=>e.stopPropagation()} data-anim>
+                <h2 className="font-serif text-2xl text-brand-900 mb-3">Salvar reflexão na ideia</h2>
+                <p className="text-sm text-brand-600 italic border-l-2 border-plum-200 pl-3 mb-4 max-h-32 overflow-auto">{salvarNota.texto}</p>
+                {ideias.length===0 ? (
+                  <p className="text-sm text-brand-500">Você ainda não tem ideias na central.</p>
+                ) : (
+                  <>
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">Anexar à ideia</label>
+                    <select value={notaIdeiaId} onChange={e=>setNotaIdeiaId(e.target.value)} className="w-full rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+                      {ideias.map(i => <option key={i.id} value={i.id}>{catById(i.categoria).emoji} {i.nome}</option>)}
+                    </select>
+                    <div className="flex gap-3 mt-4">
+                      <button onClick={confirmarNota} className="flex-1 bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Salvar nota</button>
+                      <button onClick={()=>setSalvarNota(null)} className="px-4 py-2.5 rounded-xl text-brand-500 hover:bg-brand-100 transition">Cancelar</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>}
+        </div>
+      );
+    }
+
+    /* ============================== APP ============================== */
+
+    function App() {
+      const [ideias, setIdeias] = useState(carregar);
+      const [livros, setLivros] = useState(carregarLivros);
+      const [refs, setRefs] = useState(carregarRefs);
+      const [aba, setAba] = useState('ideias'); // ideias | prompts | livro | refs
+      const [modal, setModal] = useState(null); // null | 'nova' | ideia(edição)
+      const [filtroCat, setFiltroCat] = useState('todas');
+      const [filtroNivel, setFiltroNivel] = useState('todos');
+      const [filtroProjeto, setFiltroProjeto] = useState('todos');
+      const [busca, setBusca] = useState('');
+      const [vista, setVista] = useState('cards'); // cards | kanban
+      const [agrupar, setAgrupar] = useState('nenhum'); // nenhum | projeto | categoria
+      const [exportarIdeia, setExportarIdeia] = useState(null); // null | ideia
+      const [enviarLivro, setEnviarLivro] = useState(null); // null | ideia
+      const [refFiltroIdeia, setRefFiltroIdeia] = useState(null); // id da ideia p/ filtrar referências
+      const [buscaAberta, setBuscaAberta] = useState(false);
+      const [tema, setTema] = useState(() => localStorage.getItem('central_ideias_tema') || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'));
+      const [refSeed, setRefSeed] = useState({ q:'', n:0 });
+      const [livroSeed, setLivroSeed] = useState({ id:null, n:0 });
+      const [ideiaParaPrompt, setIdeiaParaPrompt] = useState(null);
+      const [toastNode, toast] = useToast();
+      const fileRef = useRef();
+
+      useEffect(()=>{ salvar(ideias); }, [ideias]);
+      useEffect(()=>{ salvarLivros(livros); }, [livros]);
+      useEffect(()=>{ salvarRefs(refs); }, [refs]);
+      useEffect(()=>{ document.documentElement.classList.toggle('dark', tema==='dark'); localStorage.setItem('central_ideias_tema', tema); }, [tema]);
+
+      const projetos = useMemo(() =>
+        Array.from(new Set(ideias.map(i=>i.projeto).filter(Boolean))).sort(), [ideias]);
+
+      const filtradas = useMemo(() => {
+        return ideias
+          .filter(i => filtroCat==='todas' || i.categoria===filtroCat)
+          .filter(i => filtroNivel==='todos' || i.nivel===filtroNivel)
+          .filter(i => filtroProjeto==='todos' || (i.projeto||'')===filtroProjeto)
+          .filter(i => {
+            if (!busca.trim()) return true;
+            const q = busca.toLowerCase();
+            return [i.nome,i.problema,i.publico,i.proximo,i.notas,...(i.formatos||[]),...(i.conexoes||[])]
+              .join(' ').toLowerCase().includes(q);
+          })
+          .sort((a,b)=> (b.data||'').localeCompare(a.data||'') || (b.criadoEm||0)-(a.criadoEm||0));
+      }, [ideias, filtroCat, filtroNivel, filtroProjeto, busca]);
+
+      const grupos = useMemo(() => {
+        if (agrupar==='nenhum') return [{chave:'__all', titulo:null, itens:filtradas}];
+        if (agrupar==='categoria') {
+          return CATEGORIAS
+            .map(c => ({chave:c.id, titulo:`${c.emoji} ${c.curto}`, itens:filtradas.filter(i=>i.categoria===c.id)}))
+            .filter(g=>g.itens.length);
+        }
+        const comProjeto = projetos
+          .map(p => ({chave:p, titulo:`📁 ${p}`, itens:filtradas.filter(i=>i.projeto===p)}))
+          .filter(g=>g.itens.length);
+        const semProjeto = filtradas.filter(i=>!i.projeto);
+        return semProjeto.length ? [...comProjeto, {chave:'__sem', titulo:'📂 Sem projeto', itens:semProjeto}] : comProjeto;
+      }, [agrupar, filtradas, projetos]);
+
+      const moverNivel = (id, nivel) => setIdeias(s => s.map(i => i.id===id ? {...i, nivel} : i));
+
+      const lembretes = useMemo(() =>
+        ideias.filter(i => i.prazo && i.nivel!=='publicada')
+              .sort((a,b)=> a.prazo.localeCompare(b.prazo)), [ideias]);
+      const atrasados = lembretes.filter(i => diffDias(i.prazo) < 0).length;
+
+      const baixarICS = (ideia) => {
+        const blob = new Blob([icsDeIdeia(ideia)], {type:'text/calendar;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `lembrete-${(ideia.nome||'ideia').replace(/[\\/:|]/g,'-').slice(0,40).trim()}.ics`;
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        toast('Evento de calendário baixado ✓');
+      };
+
+      const emailLembretes = () => {
+        if (lembretes.length===0) { toast('Nenhum próximo passo com prazo'); return; }
+        const linhas = lembretes.map(i => `• [${rotuloPrazo(i.prazo).txt}] ${formatarData(i.prazo)} — ${i.proximo||i.nome} (${i.nome})`);
+        const corpo = encodeURIComponent('Meus próximos passos (Central de Ideias):\n\n' + linhas.join('\n'));
+        const assunto = encodeURIComponent('Central de Ideias — Meus próximos passos');
+        window.location.href = `mailto:?subject=${assunto}&body=${corpo}`;
+      };
+
+      const notificarPendentes = (manual) => {
+        if (!('Notification' in window) || Notification.permission!=='granted') { if (manual) toast('Ative os lembretes primeiro'); return; }
+        const urgentes = lembretes.filter(i => diffDias(i.prazo) <= 0);
+        if (urgentes.length===0) { if (manual) toast('Nada atrasado ou para hoje 👍'); return; }
+        const corpo = urgentes.slice(0,5).map(i => `• ${i.proximo||i.nome}`).join('\n');
+        try { new Notification(`🔔 ${urgentes.length} passo(s) para hoje/atrasado`, { body: corpo }); } catch {}
+      };
+
+      const ativarLembretes = async () => {
+        if (!('Notification' in window)) { toast('Notificações não suportadas neste navegador'); return; }
+        const p = await Notification.requestPermission();
+        if (p==='granted') { toast('Lembretes ativados ✓'); notificarPendentes(true); }
+        else toast('Permissão de notificação negada');
+      };
+
+      useEffect(() => { notificarPendentes(false); }, []);
+
+      const statsCat = useMemo(() =>
+        CATEGORIAS.map(c => ({...c, n: ideias.filter(i=>i.categoria===c.id).length})), [ideias]);
+      const statsNivel = useMemo(() =>
+        NIVEIS.map(n => ({...n, n: ideias.filter(i=>i.nivel===n.id).length})), [ideias]);
+      const maxCat = Math.max(1, ...statsCat.map(s=>s.n));
+
+      const baixarTxt = (i) => {
+        const blob = new Blob([textoExport(i)], {type:'text/plain;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = nomePadronizado(i).replace(/[\\/:|]/g,'-').trim() + '.txt';
+        a.click(); URL.revokeObjectURL(url);
+        toast('Arquivo .txt baixado ✓');
+      };
+
+      const salvarIdeia = (dados) => {
+        if (dados.id) {
+          setIdeias(s => s.map(i => i.id===dados.id ? {...i,...dados} : i));
+          toast('Ideia atualizada ✓');
+        } else {
+          setIdeias(s => [{...dados, id:uid(), criadoEm:Date.now()}, ...s]);
+          toast('Ideia salva ✓');
+        }
+        setModal(null);
+      };
+
+      const excluir = (ideia) => {
+        if (confirm(`Excluir a ideia "${ideia.nome}"?`)) {
+          setIdeias(s => s.filter(i => i.id!==ideia.id));
+          toast('Ideia excluída');
+        }
+      };
+
+      const copiarFicha = (i) => {
+        const txt =
+`FICHA DA IDEIA
+Nome: ${i.nome}
+Nome padronizado: ${nomePadronizado(i)}
+Categoria: ${catById(i.categoria).nome}
+Projeto: ${i.projeto||'—'}
+Público-alvo: ${i.publico||'—'}
+Problema que resolve: ${i.problema||'—'}
+Formato possível: ${(i.formatos||[]).join(', ')||'—'}
+Nível de maturidade: ${nivelById(i.nivel).nome}
+Conexões: ${(i.conexoes||[]).join(', ')||'—'}
+Próximo passo: ${i.proximo||'—'}
+Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexoes.map(r=>`• ${r.texto} (${formatarData(r.data)})`).join('\n') : ''}`;
+        copiar(txt, ()=>toast('Ficha copiada ✓'));
+      };
+
+      const usarNosPrompts = (ideia) => { setIdeiaParaPrompt(ideia); setAba('prompts'); window.scrollTo({top:0,behavior:'smooth'}); };
+      const verRefsDaIdeia = (ideia) => { setRefFiltroIdeia(ideia.id); setAba('refs'); window.scrollTo({top:0,behavior:'smooth'}); };
+
+      const irIdeia = (i) => { setBuscaAberta(false); setAba('ideias'); setModal(i); };
+      const irRef = (r) => { setBuscaAberta(false); setRefFiltroIdeia(null); setAba('refs'); setRefSeed(s=>({q:r.titulo||'', n:s.n+1})); window.scrollTo({top:0,behavior:'smooth'}); };
+      const irLivro = (id) => { setBuscaAberta(false); setAba('livro'); setLivroSeed(s=>({id, n:s.n+1})); window.scrollTo({top:0,behavior:'smooth'}); };
+
+      useEffect(() => {
+        const onKey = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase()==='k') { e.preventDefault(); setBuscaAberta(true); }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, []);
+
+      const exportar = () => {
+        const backup = { tipo:'central-de-ideias-backup', versao:2, data:hojeISO(), ideias, livros, referencias:refs };
+        const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `central-de-ideias-${hojeISO()}.json`;
+        a.click(); URL.revokeObjectURL(url);
+        toast('Backup exportado ✓');
+      };
+
+      const mesclar = (prev, novos) => {
+        const ids = new Set(prev.map(i=>i.id));
+        return [...(novos||[]).filter(d => d && d.id && !ids.has(d.id)), ...prev];
+      };
+
+      const importar = (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const dados = JSON.parse(reader.result);
+            if (Array.isArray(dados)) { // backup antigo (só ideias)
+              setIdeias(prev => mesclar(prev, dados));
+              toast(`${dados.length} ideia(s) importada(s) ✓`);
+            } else if (dados && (dados.ideias || dados.livros || dados.referencias)) {
+              setIdeias(prev => mesclar(prev, dados.ideias));
+              setLivros(prev => mesclar(prev, dados.livros));
+              setRefs(prev => mesclar(prev, dados.referencias));
+              const n = (dados.ideias||[]).length, l = (dados.livros||[]).length, r = (dados.referencias||[]).length;
+              toast(`Importado: ${n} ideia(s), ${l} livro(s), ${r} referência(s) ✓`);
+            } else throw 0;
+          } catch { toast('Arquivo inválido ✗'); }
+        };
+        reader.readAsText(file);
+        e.target.value='';
+      };
+
+      const stats = useMemo(()=>({
+        total: ideias.length,
+        prontas: ideias.filter(i=>i.nivel==='pronta'||i.nivel==='publicada').length,
+        pesquisa: ideias.filter(i=>i.nivel==='pesquisa').length,
+      }), [ideias]);
+
+      const tabBtn = (id, label) =>
+        <button onClick={()=>setAba(id)} className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition ${aba===id?'bg-brand-900 text-white shadow':'text-brand-600 hover:bg-brand-100'}`}>{label}</button>;
+
+      return (
+        <div className="min-h-screen">
+          {/* HEADER */}
+          <header className="bg-gradient-to-br from-brand-900 via-brand-800 to-plum-800 text-white">
+            <div className="max-w-6xl mx-auto px-5 py-6 sm:py-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <h1 className="font-serif text-3xl sm:text-4xl">Central de Ideias</h1>
+                  <p className="text-brand-100/80 mt-1 text-sm">Organize, aprofunde e transforme suas ideias — Jéssica Palin</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={()=>setTema(t=>t==='dark'?'light':'dark')} title="Alternar tema claro/escuro" className="px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-sm font-medium transition">{tema==='dark'?'☀️ Claro':'🌙 Escuro'}</button>
+                  <button onClick={()=>setBuscaAberta(true)} className="px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-sm font-medium transition flex items-center gap-2">🔍 Buscar <kbd className="hidden sm:inline text-[10px] opacity-70 border border-white/30 rounded px-1">⌘K</kbd></button>
+                  <button onClick={exportar} className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-medium transition">Exportar backup</button>
+                  <button onClick={()=>fileRef.current.click()} className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-medium transition">Importar</button>
+                  <input ref={fileRef} type="file" accept="application/json" className="hidden" onChange={importar} />
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                <button onClick={()=>setAba('ideias')} className="text-left hover:opacity-80 transition"><span className="text-2xl font-bold">{stats.total}</span> <span className="text-brand-100/70">ideias</span></button>
+                <div><span className="text-2xl font-bold">{stats.pesquisa}</span> <span className="text-brand-100/70">em pesquisa</span></div>
+                <div><span className="text-2xl font-bold">{stats.prontas}</span> <span className="text-brand-100/70">prontas/publicadas</span></div>
+                <button onClick={()=>setAba('refs')} className="text-left hover:opacity-80 transition"><span className="text-2xl font-bold">{refs.length}</span> <span className="text-brand-100/70">referências</span></button>
+                <button onClick={()=>setAba('livro')} className="text-left hover:opacity-80 transition"><span className="text-2xl font-bold">{livros.length}</span> <span className="text-brand-100/70">livros</span></button>
+              </div>
+            </div>
+          </header>
+
+          {/* NAV */}
+          <div className="sticky top-0 z-30 bg-brand-50/90 backdrop-blur border-b border-brand-200">
+            <div className="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between gap-3">
+              <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0">
+                {tabBtn('ideias','💡 Minhas Ideias')}
+                {tabBtn('mentor','🧭 Mentor')}
+                {tabBtn('prompts','✍️ Biblioteca de Prompts')}
+                {tabBtn('refs','📚 Referências')}
+                {tabBtn('livro','📖 Livro')}
+              </div>
+              {aba==='ideias' &&
+                <button onClick={()=>setModal('nova')} className="shrink-0 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-3 sm:px-4 py-2 rounded-xl transition shadow-sm whitespace-nowrap">+ Nova<span className="hidden sm:inline"> ideia</span></button>}
+            </div>
+          </div>
+
+          <main className="max-w-6xl mx-auto px-5 py-8">
+            {aba==='ideias' ? (
+              <>
+                {/* LEMBRETES */}
+                {lembretes.length>0 &&
+                  <details open className="mb-5 bg-white rounded-2xl border border-brand-200 shadow-sm group">
+                    <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between select-none">
+                      <span className="font-serif text-lg text-brand-900">
+                        🔔 Próximos passos
+                        {atrasados>0 && <span className="ml-2 text-sm font-sans text-red-600">· {atrasados} atrasado(s)</span>}
+                      </span>
+                      <span className="text-sm text-brand-400">{lembretes.length} ▾</span>
+                    </summary>
+                    <div className="px-5 pb-5 space-y-2">
+                      <div className="flex flex-wrap gap-2 pb-1">
+                        <button onClick={ativarLembretes} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">🔔 Ativar lembretes</button>
+                        <button onClick={emailLembretes} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm">✉️ Enviar por e-mail</button>
+                      </div>
+                      {lembretes.map(i => {
+                        const r = rotuloPrazo(i.prazo);
+                        return (
+                          <div key={i.id} className="flex items-center gap-2 rounded-xl border border-brand-100 hover:border-plum-300 px-2 py-1.5 transition">
+                            <button onClick={()=>setModal(i)} className="flex-1 min-w-0 text-left flex items-center gap-3 px-1">
+                              <Pill className={`shrink-0 ${r.cor}`}>{r.txt}</Pill>
+                              <span className="text-sm text-brand-500 shrink-0 whitespace-nowrap">{formatarData(i.prazo)}</span>
+                              <span className="flex-1 min-w-0 text-sm text-brand-800 font-medium truncate">{i.proximo || i.nome}</span>
+                              <span className="text-xs text-brand-400 truncate ml-auto hidden sm:block">{i.nome}</span>
+                            </button>
+                            <button onClick={()=>baixarICS(i)} title="Adicionar ao calendário (.ics)" className="shrink-0 px-2 py-1 rounded-lg border border-brand-200 text-brand-600 hover:bg-brand-100 transition text-xs">📅</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </details>}
+
+                {/* ESTATÍSTICAS */}
+                {ideias.length>0 &&
+                  <details className="mb-5 bg-white rounded-2xl border border-brand-200 shadow-sm">
+                    <summary className="cursor-pointer list-none px-5 py-4 flex items-center justify-between select-none">
+                      <span className="font-serif text-lg text-brand-900">📊 Estatísticas por categoria</span>
+                      <span className="text-sm text-brand-400">▾</span>
+                    </summary>
+                    <div className="px-5 pb-5 space-y-2">
+                      {statsCat.map(s => (
+                        <div key={s.id} className="flex items-center gap-3 text-sm">
+                          <span className="w-36 sm:w-44 shrink-0 truncate text-brand-700">{s.emoji} {s.curto}</span>
+                          <div className="flex-1 bg-brand-100 rounded-full h-2.5 overflow-hidden">
+                            <div className="h-full bg-plum-500 rounded-full transition-all" style={{width:`${(s.n/maxCat)*100}%`}}></div>
+                          </div>
+                          <span className="w-6 text-right text-brand-600 font-medium">{s.n}</span>
+                        </div>
+                      ))}
+                      <div className="pt-3 mt-2 border-t border-brand-100 flex flex-wrap gap-2">
+                        {statsNivel.map(s => <Pill key={s.id} className={s.cor}>{s.nome}: {s.n}</Pill>)}
+                      </div>
+                    </div>
+                  </details>}
+
+                {/* FILTROS */}
+                <div className="flex flex-wrap gap-3 mb-4 items-center">
+                  <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="🔍 Buscar ideia..."
+                    className="flex-1 min-w-[200px] rounded-xl border border-brand-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300" />
+                  <select value={filtroCat} onChange={e=>setFiltroCat(e.target.value)}
+                    className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+                    <option value="todas">Todas as categorias</option>
+                    {CATEGORIAS.map(c=><option key={c.id} value={c.id}>{c.emoji} {c.curto}</option>)}
+                  </select>
+                  <select value={filtroNivel} onChange={e=>setFiltroNivel(e.target.value)}
+                    className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+                    <option value="todos">Todos os níveis</option>
+                    {NIVEIS.map(n=><option key={n.id} value={n.id}>{n.nome}</option>)}
+                  </select>
+                  {projetos.length>0 &&
+                    <select value={filtroProjeto} onChange={e=>setFiltroProjeto(e.target.value)}
+                      className="rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+                      <option value="todos">Todos os projetos</option>
+                      {projetos.map(p=><option key={p} value={p}>📁 {p}</option>)}
+                    </select>}
+                </div>
+
+                {/* VISTA + AGRUPAMENTO */}
+                <div className="flex flex-wrap gap-3 mb-6 items-center justify-between">
+                  <div className="inline-flex rounded-xl border border-brand-200 bg-white p-1">
+                    <button onClick={()=>setVista('cards')}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${vista==='cards'?'bg-brand-900 text-white':'text-brand-600 hover:bg-brand-100'}`}>🗂️ Cards</button>
+                    <button onClick={()=>setVista('kanban')}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${vista==='kanban'?'bg-brand-900 text-white':'text-brand-600 hover:bg-brand-100'}`}>📋 Quadro (Kanban)</button>
+                  </div>
+                  {vista==='cards' ? (
+                    <div className="flex items-center gap-2 text-sm text-brand-600">
+                      <span>Agrupar por:</span>
+                      <select value={agrupar} onChange={e=>setAgrupar(e.target.value)}
+                        className="rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300">
+                        <option value="nenhum">Nenhum</option>
+                        <option value="projeto">Projeto / subpasta</option>
+                        <option value="categoria">Categoria</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-brand-400">Arraste os cards entre as colunas para mudar o nível.</span>
+                  )}
+                </div>
+
+                {filtradas.length===0 ? (
+                  <div className="text-center py-20 text-brand-500">
+                    <p className="font-serif text-2xl mb-2">Nenhuma ideia aqui</p>
+                    <p className="text-sm">Clique em <strong>+ Nova ideia</strong> para começar.</p>
+                  </div>
+                ) : vista==='kanban' ? (
+                  <KanbanBoard ideias={filtradas} onEditar={setModal} onMover={moverNivel} />
+                ) : (
+                  <div className="space-y-8">
+                    {grupos.map(g => (
+                      <div key={g.chave}>
+                        {g.titulo &&
+                          <h3 className="font-serif text-xl text-brand-800 mb-4 flex items-center gap-2">
+                            {g.titulo}<span className="text-sm text-brand-400">({g.itens.length})</span>
+                          </h3>}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                          {g.itens.map(i => (
+                            <IdeiaCard key={i.id} ideia={i}
+                              onEditar={setModal} onExcluir={excluir}
+                              onUsarPrompt={usarNosPrompts} onCopiarFicha={copiarFicha}
+                              onExportar={setExportarIdeia} onEnviarLivro={setEnviarLivro}
+                              refsCount={refs.filter(r=>(r.ideiaIds||[]).includes(i.id)).length} onVerRefs={verRefsDaIdeia} />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : aba==='mentor' ? (
+              <ChatMentor ideias={ideias} setIdeias={setIdeias} toast={toast} />
+            ) : aba==='refs' ? (
+              <ReferenciasTab refs={refs} setRefs={setRefs} ideias={ideias} copiar={copiar} toast={toast}
+                filtroIdeia={refFiltroIdeia} setFiltroIdeia={setRefFiltroIdeia} seed={refSeed} />
+            ) : aba==='livro' ? (
+              <LivroTab livros={livros} setLivros={setLivros} ideias={ideias} toast={toast} abrir={livroSeed} />
+            ) : (
+              <>
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="font-serif text-2xl text-brand-900">Biblioteca de Prompts</h2>
+                    <p className="text-sm text-brand-600">Os prompts da Jéssica para a Ely. Abra um, ajuste e copie.</p>
+                  </div>
+                  {ideiaParaPrompt && (
+                    <div className="flex items-center gap-2 text-sm bg-plum-50 border border-plum-200 text-plum-800 rounded-xl px-3 py-2">
+                      Ideia ativa: <strong>{ideiaParaPrompt.nome}</strong>
+                      <button onClick={()=>setIdeiaParaPrompt(null)} className="ml-1 text-plum-500 hover:text-plum-700">✕</button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <PromptCard prompt={PROMPT_MAE} ideia={ideiaParaPrompt} onCopiado={()=>toast('Prompt copiado ✓')} />
+                  <div className="pt-2 text-xs font-semibold uppercase tracking-wide text-brand-500">Prompts por fase</div>
+                  {PROMPTS.map(p => (
+                    <PromptCard key={p.id} prompt={p} ideia={ideiaParaPrompt} onCopiado={()=>toast('Prompt copiado ✓')} />
+                  ))}
+                </div>
+              </>
+            )}
+          </main>
+
+          {/* MODAL */}
+          {modal && (
+            <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setModal(null)}>
+              <div className="bg-brand-50 rounded-2xl shadow-2xl max-w-2xl w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+                <h2 className="font-serif text-2xl text-brand-900 mb-5">{modal==='nova'?'Nova ideia':'Editar ideia'}</h2>
+                <FichaForm
+                  inicial={modal==='nova'?null:modal}
+                  onSalvar={salvarIdeia}
+                  onCancelar={()=>setModal(null)}
+                  projetos={projetos} />
+              </div>
+            </div>
+          )}
+
+          {/* MODAL EXPORTAR */}
+          {exportarIdeia && (
+            <div className="fixed inset-0 z-40 bg-brand-900/40 backdrop-blur-sm flex items-start justify-center p-4 overflow-auto" onClick={()=>setExportarIdeia(null)}>
+              <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full my-8 p-6" onClick={e=>e.stopPropagation()} data-anim>
+                <h2 className="font-serif text-2xl text-brand-900 mb-4">Exportar ideia</h2>
+                <div id="folha-impressao" className="border border-brand-200 rounded-xl p-5 mb-4 bg-white">
+                  <FolhaImpressao ideia={exportarIdeia} />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button onClick={()=>window.print()} className="flex-1 min-w-[140px] bg-plum-600 hover:bg-plum-700 text-white font-semibold py-2.5 rounded-xl transition">Salvar como PDF</button>
+                  <button onClick={()=>baixarTxt(exportarIdeia)} className="px-5 py-2.5 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Baixar .txt</button>
+                  <button onClick={()=>copiar(textoExport(exportarIdeia), ()=>toast('Texto copiado ✓'))} className="px-5 py-2.5 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Copiar texto</button>
+                  <button onClick={()=>setExportarIdeia(null)} className="px-4 py-2.5 rounded-xl text-brand-500 hover:bg-brand-100 transition">Fechar</button>
+                </div>
+                <p className="mt-3 text-xs text-brand-400">Para PDF: na janela de impressão escolha “Salvar como PDF / Destino: PDF”.</p>
+              </div>
+            </div>
+          )}
+
+          {/* BUSCA GLOBAL */}
+          {buscaAberta && (
+            <BuscaGlobal ideias={ideias} refs={refs} livros={livros}
+              onFechar={()=>setBuscaAberta(false)}
+              onIrIdeia={irIdeia} onIrRef={irRef} onIrLivro={irLivro} />
+          )}
+
+          {/* MODAL ENVIAR P/ LIVRO */}
+          {enviarLivro && (
+            <EnviarLivroModal ideia={enviarLivro} livros={livros} setLivros={setLivros}
+              onFechar={()=>setEnviarLivro(null)} toast={toast} />
+          )}
+
+          <footer className="max-w-6xl mx-auto px-5 py-10 text-center text-xs text-brand-400">
+            Seus dados ficam salvos apenas neste computador (neste navegador). Use <strong>Exportar backup</strong> regularmente.
+          </footer>
+
+          {toastNode}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
