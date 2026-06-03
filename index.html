@@ -7,8 +7,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Central de Ideias" />
-  <title>Central de Ideias da Jéssica</title>
+  <meta name="apple-mobile-web-app-title" content="Jardim de Ideias" />
+  <title>Jardim de Ideias da Jéssica</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -176,7 +176,7 @@
       titulo:'⭐ Prompt-mãe — Registrar nova ideia',
       desc:'O principal. Use sempre que tiver uma ideia nova: ele organiza, aprofunda e classifica de uma vez.',
       texto:
-`Ely, estou registrando uma nova ideia para minha Central de Ideias.
+`Ely, estou registrando uma nova ideia para minha Jardim de Ideias.
 Quero que você organize, aprofunde e classifique essa ideia.
 Analise nos seguintes pontos:
 1. Tema central;
@@ -442,7 +442,7 @@ Tema: {{IDEIA}}`
       const d = (ideia.prazo || hojeISO()).replace(/-/g,'');
       const resumo = escICS(ideia.proximo || ideia.nome || 'Próximo passo');
       const desc = escICS(`Ideia: ${ideia.nome}` + (ideia.proximo ? ` — ${ideia.proximo}` : ''));
-      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Central de Ideias//PT-BR','CALSCALE:GREGORIAN',
+      return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Jardim de Ideias//PT-BR','CALSCALE:GREGORIAN',
         'BEGIN:VEVENT',`UID:${ideia.id}@central-de-ideias`,
         `DTSTART:${d}T090000`,`DTEND:${d}T093000`,
         `SUMMARY:${resumo}`,`DESCRIPTION:${desc}`,
@@ -451,7 +451,7 @@ Tema: {{IDEIA}}`
     };
 
     /* ===== MENTOR (coach que questiona) ===== */
-    const PERSONA_SISTEMA = `Você é o "Mentor" da Jéssica, dentro do app pessoal dela (Central de Ideias). Seu papel NÃO é concordar nem agradar — é fazê-la PENSAR e AGIR.
+    const PERSONA_SISTEMA = `Você é o "Mentor" da Jéssica, dentro do app pessoal dela (Jardim de Ideias). Seu papel NÃO é concordar nem agradar — é fazê-la PENSAR e AGIR.
 
 Sobre a Jéssica:
 - Temperamento FLEUMÁTICO: tende a evitar conflito, acomodar-se, manter a paz e PROCRASTINAR. Combata isso pedindo compromissos concretos, pequenos e com prazo. Não aceite "depois", "talvez", "quando der".
@@ -2077,8 +2077,8 @@ Como você age:
       const emailLembretes = () => {
         if (lembretes.length===0) { toast('Nenhum próximo passo com prazo'); return; }
         const linhas = lembretes.map(i => `• [${rotuloPrazo(i.prazo).txt}] ${formatarData(i.prazo)} — ${i.proximo||i.nome} (${i.nome})`);
-        const corpo = encodeURIComponent('Meus próximos passos (Central de Ideias):\n\n' + linhas.join('\n'));
-        const assunto = encodeURIComponent('Central de Ideias — Meus próximos passos');
+        const corpo = encodeURIComponent('Meus próximos passos (Jardim de Ideias):\n\n' + linhas.join('\n'));
+        const assunto = encodeURIComponent('Jardim de Ideias — Meus próximos passos');
         window.location.href = `mailto:?subject=${assunto}&body=${corpo}`;
       };
 
@@ -2221,7 +2221,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                     <span className="text-xl sm:text-2xl font-semibold tracking-tight">JP</span>
                   </div>
                   <div>
-                    <h1 className="font-serif text-3xl sm:text-4xl">Central de Ideias</h1>
+                    <h1 className="font-serif text-3xl sm:text-4xl">Jardim de Ideias</h1>
                     <p className="text-brand-100/80 mt-1 text-sm">Organize, aprofunde e transforme suas ideias — Jéssica Palin</p>
                   </div>
                 </div>
