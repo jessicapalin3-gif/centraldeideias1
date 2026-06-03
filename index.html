@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#5d372d" />
+  <meta name="theme-color" content="#434d22" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -26,9 +26,9 @@
           },
           colors: {
             brand: {
-              50:'#faf6f2',100:'#f3e9df',200:'#e6d2bf',300:'#d4b394',
-              400:'#c2926b',500:'#b3784f',600:'#a56342',700:'#894e38',
-              800:'#704033',900:'#5d372d',
+              50:'#f7f8f1',100:'#edefe1',200:'#dadec5',300:'#c0c69f',
+              400:'#a2aa7e',500:'#848d63',600:'#6c744e',700:'#555c40',
+              800:'#444a35',900:'#383d2c',
             },
             plum: {
               50:'#f6f7ee',100:'#e9ecd6',200:'#d3d9af',300:'#b6c07f',
@@ -44,8 +44,8 @@
     body { font-family:'Inter',sans-serif; }
     .font-serif { font-family:'Fraunces',serif; }
     ::-webkit-scrollbar { width:10px; height:10px; }
-    ::-webkit-scrollbar-thumb { background:#d4b394; border-radius:8px; }
-    ::-webkit-scrollbar-track { background:#f3e9df; }
+    ::-webkit-scrollbar-thumb { background:#c0c69f; border-radius:8px; }
+    ::-webkit-scrollbar-track { background:#edefe1; }
     .no-scrollbar::-webkit-scrollbar { display:none; }
     .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
     /* evita o zoom automático do iOS ao focar campos no celular */
@@ -57,33 +57,33 @@
 
     /* ===== MODO ESCURO (só na tela; impressão continua clara) ===== */
     @media screen {
-      html.dark, .dark body { background-color:#15110d; }
-      .dark body { color:#f1e8dc; }
+      html.dark, .dark body { background-color:#14160f; }
+      .dark body { color:#eef0e4; }
 
-      .dark .bg-white { background-color:#211b16 !important; }
-      .dark .bg-brand-50 { background-color:#15110d; }
-      .dark .bg-brand-50\/60 { background-color:rgba(21,17,13,.6); }
-      .dark .bg-brand-50\/90 { background-color:rgba(21,17,13,.9); }
-      .dark .bg-brand-100 { background-color:#2b231c; }
-      .dark .bg-brand-100\/40 { background-color:rgba(43,35,28,.4); }
-      .dark .bg-brand-100\/70 { background-color:rgba(43,35,28,.7); }
-      .dark .bg-brand-600 { background-color:#a56342; }
-      .dark .bg-brand-800 { background-color:#9c6748; }
-      .dark .bg-brand-900 { background-color:#8a5a3e; }
+      .dark .bg-white { background-color:#1d1f16 !important; }
+      .dark .bg-brand-50 { background-color:#14160f; }
+      .dark .bg-brand-50\/60 { background-color:rgba(20,22,15,.6); }
+      .dark .bg-brand-50\/90 { background-color:rgba(20,22,15,.9); }
+      .dark .bg-brand-100 { background-color:#262a1c; }
+      .dark .bg-brand-100\/40 { background-color:rgba(38,42,28,.4); }
+      .dark .bg-brand-100\/70 { background-color:rgba(38,42,28,.7); }
+      .dark .bg-brand-600 { background-color:#6f7a4a; }
+      .dark .bg-brand-800 { background-color:#4a5238; }
+      .dark .bg-brand-900 { background-color:#5b6640; }
 
-      .dark .text-brand-900 { color:#f1e8dc; }
-      .dark .text-brand-800 { color:#e7dccd; }
-      .dark .text-brand-700 { color:#d8cbb9; }
-      .dark .text-brand-600 { color:#bba994; }
-      .dark .text-brand-500 { color:#a4917a; }
-      .dark .text-brand-400 { color:#8a7763; }
-      .dark .text-brand-300 { color:#6f5d4c; }
+      .dark .text-brand-900 { color:#eef0e4; }
+      .dark .text-brand-800 { color:#e2e6d3; }
+      .dark .text-brand-700 { color:#d2d8c0; }
+      .dark .text-brand-600 { color:#aab394; }
+      .dark .text-brand-500 { color:#98a07e; }
+      .dark .text-brand-400 { color:#808a66; }
+      .dark .text-brand-300 { color:#5f6a4a; }
 
-      .dark .border-brand-100 { border-color:#2b231c; }
-      .dark .border-brand-200 { border-color:#3a2f26; }
-      .dark .border-brand-300 { border-color:#463a2f; }
-      .dark .ring-brand-200 { --tw-ring-color:#3a2f26; }
-      .dark .ring-brand-300 { --tw-ring-color:#463a2f; }
+      .dark .border-brand-100 { border-color:#262a1c; }
+      .dark .border-brand-200 { border-color:#353b28; }
+      .dark .border-brand-300 { border-color:#424a32; }
+      .dark .ring-brand-200 { --tw-ring-color:#353b28; }
+      .dark .ring-brand-300 { --tw-ring-color:#424a32; }
 
       .dark .bg-plum-50, .dark .bg-plum-50\/60 { background-color:#1e2415; }
       .dark .bg-plum-100 { background-color:#28301c; }
@@ -111,14 +111,14 @@
       .dark .bg-stone-100 { background-color:#2a2622; }
       .dark .text-stone-700 { color:#cfc4b8; }
 
-      .dark ::-webkit-scrollbar-thumb { background:#463a2f; }
-      .dark ::-webkit-scrollbar-track { background:#1c1712; }
+      .dark ::-webkit-scrollbar-thumb { background:#424a32; }
+      .dark ::-webkit-scrollbar-track { background:#1b1e14; }
     }
 
     @page {
       size: A4;
       margin: 1.8cm;
-      @bottom-right { content: "Página " counter(page); font-family:'Inter',sans-serif; font-size:10px; color:#9a8c7e; }
+      @bottom-right { content: "Página " counter(page); font-family:'Inter',sans-serif; font-size:10px; color:#848d63; }
     }
     @media print {
       body * { visibility: hidden; }
@@ -2209,7 +2209,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
       return (
         <div className="min-h-screen">
           {/* HEADER */}
-          <header className="bg-gradient-to-br from-brand-900 via-brand-800 to-plum-800 text-white">
+          <header className="bg-plum-800 text-white">
             <div className="max-w-6xl mx-auto px-5 py-6 sm:py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
