@@ -31,9 +31,9 @@
               800:'#704033',900:'#5d372d',
             },
             plum: {
-              50:'#f8f5fb',100:'#efe7f6',200:'#e0cfee',300:'#c9aae0',
-              400:'#ad7ecd',500:'#945bb8',600:'#7d459c',700:'#683780',
-              800:'#572f6a',900:'#4a2a59',
+              50:'#f6f7ee',100:'#e9ecd6',200:'#d3d9af',300:'#b6c07f',
+              400:'#9aa856',500:'#7f8f3c',600:'#67762f',700:'#525f27',
+              800:'#434d22',900:'#3a4220',
             }
           }
         }
@@ -85,14 +85,14 @@
       .dark .ring-brand-200 { --tw-ring-color:#3a2f26; }
       .dark .ring-brand-300 { --tw-ring-color:#463a2f; }
 
-      .dark .bg-plum-50, .dark .bg-plum-50\/60 { background-color:#251a2e; }
-      .dark .bg-plum-100 { background-color:#2e2138; }
-      .dark .text-plum-800 { color:#d9c2ec; }
-      .dark .text-plum-700 { color:#c9aae0; }
-      .dark .text-plum-600 { color:#bd97d8; }
-      .dark .border-plum-100 { border-color:#3a2147; }
-      .dark .border-plum-200 { border-color:#4a2a59; }
-      .dark .ring-plum-200 { --tw-ring-color:#4a2a59; }
+      .dark .bg-plum-50, .dark .bg-plum-50\/60 { background-color:#1e2415; }
+      .dark .bg-plum-100 { background-color:#28301c; }
+      .dark .text-plum-800 { color:#cfe09b; }
+      .dark .text-plum-700 { color:#c2d488; }
+      .dark .text-plum-600 { color:#b3c977; }
+      .dark .border-plum-100 { border-color:#313a20; }
+      .dark .border-plum-200 { border-color:#3f4a28; }
+      .dark .ring-plum-200 { --tw-ring-color:#3f4a28; }
 
       .dark .bg-amber-50 { background-color:#2a2212; }
       .dark .bg-amber-100 { background-color:#3a2f14; }
@@ -1697,7 +1697,7 @@ Como você age:
       const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const partes = t.split(new RegExp(`(${esc})`, 'ig'));
       return partes.map((p,i) => p.toLowerCase()===q.toLowerCase()
-        ? <mark key={i} className="rounded px-0.5 font-semibold" style={{background:'rgba(173,126,205,.38)', color:'inherit'}}>{p}</mark>
+        ? <mark key={i} className="rounded px-0.5 font-semibold" style={{background:'rgba(154,168,86,.45)', color:'inherit'}}>{p}</mark>
         : p);
     }
 
