@@ -2216,9 +2216,14 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
           <header className="bg-plum-800 text-white">
             <div className="max-w-6xl mx-auto px-5 py-6 sm:py-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <h1 className="font-serif text-3xl sm:text-4xl">Central de Ideias</h1>
-                  <p className="text-brand-100/80 mt-1 text-sm">Organize, aprofunde e transforme suas ideias — Jéssica Palin</p>
+                <div className="flex items-center gap-3">
+                  <div className="shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl border-2 flex flex-col items-center justify-center font-serif leading-none" style={{borderColor:'#c9a44a', color:'#c9a44a'}}>
+                    <span className="text-xl sm:text-2xl font-semibold tracking-tight">JP</span>
+                  </div>
+                  <div>
+                    <h1 className="font-serif text-3xl sm:text-4xl">Central de Ideias</h1>
+                    <p className="text-brand-100/80 mt-1 text-sm">Organize, aprofunde e transforme suas ideias — Jéssica Palin</p>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button onClick={()=>setTema(t=>t==='dark'?'light':'dark')} title="Alternar tema claro/escuro" className="px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-sm font-medium transition">{tema==='dark'?'☀️ Claro':'🌙 Escuro'}</button>
