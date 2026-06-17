@@ -2097,6 +2097,28 @@ Como você age:
       return novo;
     };
 
+    const LS_PONTOS = 'central_ideias_pontos_hist_v1';
+    const carregarPontosHist = () => { try { const a = JSON.parse(localStorage.getItem(LS_PONTOS)); return Array.isArray(a) ? a : []; } catch { return []; } };
+    const registrarPontos = (pontos) => {
+      const hist = carregarPontosHist();
+      const hoje = hojeISO();
+      const i = hist.findIndex(e => e.d === hoje);
+      if (i >= 0) { if (hist[i].p === pontos) return hist; hist[i] = { d: hoje, p: pontos }; }
+      else hist.push({ d: hoje, p: pontos });
+      const corte = emDias(-40);
+      const limpo = hist.filter(e => e.d >= corte).sort((a,b)=>a.d.localeCompare(b.d));
+      try { localStorage.setItem(LS_PONTOS, JSON.stringify(limpo)); } catch {}
+      return limpo;
+    };
+    const ganhosSemana = (pontos) => {
+      const hist = carregarPontosHist();
+      if (!hist.length) return 0;
+      const limite = emDias(-7);
+      const antigos = hist.filter(e => e.d <= limite);
+      const base = antigos.length ? antigos[antigos.length-1].p : hist[0].p;
+      return Math.max(0, pontos - base);
+    };
+
     function GamificacaoPanel({ pontos, jardim, streak, conquistas }) {
       const ganhas = conquistas.filter(c=>c.ok).length;
       return (
@@ -2450,6 +2472,9 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
         prevNivel.current = jardim.idx;
       }, [jardim.idx]);
 
+      const [pontosSemana, setPontosSemana] = useState(0);
+      useEffect(() => { registrarPontos(pontos); setPontosSemana(ganhosSemana(pontos)); }, [pontos]);
+
       const tabBtn = (id, label) =>
         <button onClick={()=>setAba(id)} className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition ${aba===id?'bg-brand-900 text-white shadow':'text-brand-600 hover:bg-brand-100'}`}>{label}</button>;
 
@@ -2647,19 +2672,47 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                 const andamento = ideias.filter(i=>['inicial','pesquisa','estruturada','pronta'].includes(i.nivel)).length;
                 const reflex = ideias.reduce((s,i)=>s+(i.reflexoes||[]).length,0);
                 const caps = livros.reduce((s,l)=>s+(l.capitulos||[]).filter(c=>contarPalavras(c.texto)>0).length,0);
+                const palavras = livros.reduce((s,l)=>s+(l.capitulos||[]).reduce((a,c)=>a+contarPalavras(c.texto),0),0);
                 const maxNiv = Math.max(1, ...statsNivel.map(s=>s.n));
+                const mesAtual = hojeISO().slice(0,7);
+                const ideasMes = ideias.filter(i=>{ let ym; if(i.criadoEm){const d=new Date(i.criadoEm); ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;} else ym=(i.data||'').slice(0,7); return ym===mesAtual; }).length;
+                const hora = new Date().getHours();
+                const saud = hora<12 ? 'Bom dia' : hora<18 ? 'Boa tarde' : 'Boa noite';
+                const FRASES = [
+                  'Uma ação de 15 minutos hoje vale mais que um plano perfeito amanhã.',
+                  'A realidade muda quando você dá o primeiro passo — qual é o seu agora?',
+                  'Constância vence intensidade. Reguinho hoje, floresta amanhã. 🌳',
+                  'Você não precisa de vontade, precisa de começar. O resto vem.',
+                  'Escolha a tarefa que você está evitando. É ela que destrava o dia.',
+                  'Plantar é um ato de fé: trabalhe hoje, confie na colheita.',
+                  'Decida pelo essencial e deixe o resto cair. Foco é poder.',
+                  'Cada ideia organizada é uma semente que para de se perder no vento.',
+                  'Pessoas valem o esforço — inclusive você. Cuide do seu jardim.',
+                  'Feito hoje, melhor que perfeito nunca. Avance um palmo.',
+                ];
+                const frase = FRASES[parseInt(hojeISO().replace(/-/g,''),10) % FRASES.length];
                 const cards = [
                   {emoji:'💡', label:'Ideias', valor:stats.total},
                   {emoji:'✅', label:'Concluídas/Publicadas', valor:concluidas},
                   {emoji:'⚙️', label:'Em andamento', valor:andamento},
                   {emoji:'⏰', label:'Passos atrasados', valor:atrasados, alerta:atrasados>0},
+                  {emoji:'📈', label:'Pontos nesta semana', valor:'+'+pontosSemana},
+                  {emoji:'🗓️', label:'Ideias criadas no mês', valor:ideasMes},
+                  {emoji:'📝', label:'Palavras nos livros', valor:palavras.toLocaleString('pt-BR')},
+                  {emoji:'💭', label:'Reflexões salvas', valor:reflex},
                   {emoji:'📚', label:'Referências', valor:refs.length},
                   {emoji:'📖', label:'Livros', valor:livros.length},
                   {emoji:'✍️', label:'Capítulos escritos', valor:caps},
-                  {emoji:'💭', label:'Reflexões salvas', valor:reflex},
                 ];
                 return (
                   <div data-anim className="space-y-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <h2 className="font-serif text-2xl sm:text-3xl text-brand-900">{saud}, Jéssica 🌱</h2>
+                        <p className="text-sm text-brand-600 mt-1 max-w-xl">{frase}</p>
+                      </div>
+                      <button onClick={()=>setModal('nova')} className="shrink-0 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">+ Nova ideia</button>
+                    </div>
                     <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} />
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {cards.map((c,i)=>(
