@@ -2028,6 +2028,109 @@ Como você age:
       return data.content.sha;
     };
 
+    /* ============================== GAMIFICAÇÃO (🌱 Jardim) ============================== */
+
+    const NIVEIS_JARDIM = [
+      { min:0,    nome:'Semente',            emoji:'🌰' },
+      { min:60,   nome:'Broto',              emoji:'🌱' },
+      { min:160,  nome:'Muda',               emoji:'🌿' },
+      { min:360,  nome:'Plantinha',          emoji:'🪴' },
+      { min:700,  nome:'Árvore',             emoji:'🌳' },
+      { min:1200, nome:'Jardim em flor',     emoji:'🌸' },
+      { min:2200, nome:'Jardim exuberante',  emoji:'🏡' },
+    ];
+    const _nivIdx = { inicial:0, pesquisa:1, estruturada:2, pronta:3, publicada:4, concluida:5 };
+
+    const pontosDe = (ideias, livros, refs) => {
+      let p = 0;
+      ideias.forEach(i => { p += 10 + (_nivIdx[i.nivel]||0)*5; p += (i.reflexoes||[]).length*4; if (i.prazo) p += 2; });
+      p += (refs||[]).length * 5;
+      (livros||[]).forEach(l => { p += 10; (l.capitulos||[]).forEach(c => { if (contarPalavras(c.texto)>0) p += 8; }); });
+      return p;
+    };
+
+    const nivelJardim = (pontos) => {
+      let idx = 0;
+      for (let k=0;k<NIVEIS_JARDIM.length;k++) if (pontos >= NIVEIS_JARDIM[k].min) idx = k;
+      const atual = NIVEIS_JARDIM[idx], prox = NIVEIS_JARDIM[idx+1] || null;
+      const progresso = prox ? Math.max(0, Math.min(100, Math.round(((pontos-atual.min)/(prox.min-atual.min))*100))) : 100;
+      return { idx, atual, prox, progresso };
+    };
+
+    const calcConquistas = (ideias, livros, refs, streak) => {
+      const concl = ideias.filter(i=>i.nivel==='concluida'||i.nivel==='publicada').length;
+      const reflex = ideias.reduce((s,i)=>s+(i.reflexoes||[]).length,0);
+      const comPrazo = ideias.filter(i=>i.prazo).length;
+      const caps = (livros||[]).reduce((s,l)=>s+(l.capitulos||[]).filter(c=>contarPalavras(c.texto)>0).length,0);
+      const d = streak.dias||0;
+      return [
+        { id:'i1',  emoji:'🌱', nome:'Primeira semente', desc:'Cadastre sua 1ª ideia',        ok: ideias.length>=1 },
+        { id:'i10', emoji:'🧠', nome:'Mente fértil',     desc:'10 ideias cadastradas',         ok: ideias.length>=10 },
+        { id:'i25', emoji:'🌟', nome:'Visionária',       desc:'25 ideias cadastradas',         ok: ideias.length>=25 },
+        { id:'c1',  emoji:'✅', nome:'Primeira colheita',desc:'Conclua 1 ideia',               ok: concl>=1 },
+        { id:'c5',  emoji:'🏆', nome:'Colheita farta',   desc:'Conclua 5 ideias',              ok: concl>=5 },
+        { id:'r1',  emoji:'📚', nome:'Estudiosa',        desc:'Adicione 1 referência',         ok: (refs||[]).length>=1 },
+        { id:'r10', emoji:'🔎', nome:'Pesquisadora',     desc:'10 referências',                ok: (refs||[]).length>=10 },
+        { id:'l1',  emoji:'📖', nome:'Autora',           desc:'Crie 1 livro',                  ok: (livros||[]).length>=1 },
+        { id:'cap5',emoji:'✍️', nome:'Escritora',        desc:'Escreva 5 capítulos',           ok: caps>=5 },
+        { id:'ref5',emoji:'💭', nome:'Reflexiva',        desc:'5 reflexões salvas',            ok: reflex>=5 },
+        { id:'p5',  emoji:'🎯', nome:'Focada',           desc:'Defina prazo em 5 ideias',      ok: comPrazo>=5 },
+        { id:'s3',  emoji:'🔥', nome:'Constância',       desc:'Ofensiva de 3 dias',            ok: d>=3 },
+        { id:'s7',  emoji:'⚡', nome:'Disciplina',       desc:'Ofensiva de 7 dias seguidos',   ok: d>=7 },
+      ];
+    };
+
+    const LS_STREAK = 'central_ideias_streak_v1';
+    const carregarStreak = () => { try { return Object.assign({ultimoDia:'', dias:0, recorde:0}, JSON.parse(localStorage.getItem(LS_STREAK))||{}); } catch { return {ultimoDia:'', dias:0, recorde:0}; } };
+    const registrarStreak = () => {
+      const s = carregarStreak();
+      const hoje = hojeISO();
+      if (s.ultimoDia === hoje) return s;
+      const dias = (s.ultimoDia === emDias(-1)) ? (s.dias+1) : 1;
+      const novo = { ultimoDia: hoje, dias, recorde: Math.max(s.recorde||0, dias) };
+      try { localStorage.setItem(LS_STREAK, JSON.stringify(novo)); } catch {}
+      return novo;
+    };
+
+    function GamificacaoPanel({ pontos, jardim, streak, conquistas }) {
+      const ganhas = conquistas.filter(c=>c.ok).length;
+      return (
+        <div className="mb-5 bg-white rounded-2xl border border-brand-200 shadow-sm p-5" data-anim>
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="text-5xl leading-none">{jardim.atual.emoji}</div>
+            <div className="flex-1 min-w-[180px]">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-serif text-lg text-brand-900">Meu Jardim · {jardim.atual.nome}</h3>
+                <span className="text-sm font-semibold text-plum-600">{pontos} pts</span>
+              </div>
+              <div className="mt-2 h-2.5 rounded-full bg-brand-100 overflow-hidden">
+                <div className="h-full bg-plum-600 rounded-full transition-all" style={{width:jardim.progresso+'%'}}></div>
+              </div>
+              <div className="mt-1 text-xs text-brand-400">
+                {jardim.prox ? `Faltam ${jardim.prox.min - pontos} pts para ${jardim.prox.emoji} ${jardim.prox.nome}` : 'Nível máximo alcançado! 🌟'}
+              </div>
+            </div>
+            <div className="text-center px-2 shrink-0">
+              <div className="text-2xl">🔥</div>
+              <div className="font-bold text-brand-800 leading-none">{streak.dias}</div>
+              <div className="text-[11px] text-brand-400">dia(s) seguido(s){streak.recorde>streak.dias?` · recorde ${streak.recorde}`:''}</div>
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-semibold uppercase tracking-wide text-brand-500 mb-2">Conquistas · {ganhas}/{conquistas.length}</div>
+            <div className="flex flex-wrap gap-2">
+              {conquistas.map(c => (
+                <span key={c.id} title={`${c.nome} — ${c.desc}${c.ok?' ✓':' (bloqueada)'}`}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs ring-1 transition ${c.ok ? 'bg-plum-50 text-plum-700 ring-plum-200' : 'bg-brand-50 text-brand-400 ring-brand-200 opacity-60'}`}>
+                  <span className={c.ok?'':'grayscale'}>{c.emoji}</span>{c.nome}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ============================== APP ============================== */
 
     function App() {
@@ -2050,6 +2153,7 @@ Como você age:
       const [refSeed, setRefSeed] = useState({ q:'', n:0 });
       const [livroSeed, setLivroSeed] = useState({ id:null, n:0 });
       const [ideiaParaPrompt, setIdeiaParaPrompt] = useState(null);
+      const [streak] = useState(registrarStreak);
       const [syncCfg, setSyncCfg] = useState(carregarSync);
       const [syncStatus, setSyncStatus] = useState(carregarSync().ativo ? 'pendente' : 'off'); // off|pendente|salvando|ok|erro
       const [verSync, setVerSync] = useState(false);
@@ -2295,6 +2399,15 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
         pesquisa: ideias.filter(i=>i.nivel==='pesquisa').length,
       }), [ideias]);
 
+      const pontos = useMemo(()=>pontosDe(ideias, livros, refs), [ideias, livros, refs]);
+      const jardim = useMemo(()=>nivelJardim(pontos), [pontos]);
+      const conquistas = useMemo(()=>calcConquistas(ideias, livros, refs, streak), [ideias, livros, refs, streak]);
+      const prevNivel = useRef(jardim.idx);
+      useEffect(() => {
+        if (jardim.idx > prevNivel.current) toast(`🎉 Seu jardim evoluiu para ${jardim.atual.emoji} ${jardim.atual.nome}!`);
+        prevNivel.current = jardim.idx;
+      }, [jardim.idx]);
+
       const tabBtn = (id, label) =>
         <button onClick={()=>setAba(id)} className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition ${aba===id?'bg-brand-900 text-white shadow':'text-brand-600 hover:bg-brand-100'}`}>{label}</button>;
 
@@ -2353,6 +2466,9 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
           <main className="max-w-6xl mx-auto px-5 py-8">
             {aba==='ideias' ? (
               <>
+                {/* GAMIFICAÇÃO */}
+                <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} />
+
                 {/* LEMBRETES */}
                 {lembretes.length>0 &&
                   <details open className="mb-5 bg-white rounded-2xl border border-brand-200 shadow-sm group">
