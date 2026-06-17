@@ -13,7 +13,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
@@ -161,6 +161,7 @@
       { id:'estruturada', nome:'Estruturada',    cor:'bg-blue-100 text-blue-800 ring-blue-300' },
       { id:'pronta',      nome:'Pronta',         cor:'bg-emerald-100 text-emerald-800 ring-emerald-300' },
       { id:'publicada',   nome:'Publicada',      cor:'bg-plum-100 text-plum-800 ring-plum-300' },
+      { id:'concluida',   nome:'✓ Concluída',    cor:'bg-emerald-100 text-emerald-800 ring-emerald-300' },
     ];
     const nivelById = (id) => NIVEIS.find(n => n.id === id) || NIVEIS[0];
 
@@ -817,7 +818,7 @@ Como você age:
       const [over, setOver] = useState(null);
       const dragId = useRef(null);
       return (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           {NIVEIS.map(n => {
             const cards = ideias.filter(i => i.nivel===n.id);
             return (
@@ -1840,7 +1841,7 @@ Como você age:
       useEffect(() => { if (fimRef.current) fimRef.current.scrollIntoView({behavior:'smooth'}); }, [mensagens, carregando]);
 
       const ctx = () => ({
-        atrasados: ideias.filter(i=>i.prazo && i.nivel!=='publicada' && diffDias(i.prazo)<0).sort((a,b)=>a.prazo.localeCompare(b.prazo)),
+        atrasados: ideias.filter(i=>i.prazo && !['publicada','concluida'].includes(i.nivel) && diffDias(i.prazo)<0).sort((a,b)=>a.prazo.localeCompare(b.prazo)),
         totalIdeias: ideias.length,
         paradas: ideias.filter(i=>i.nivel==='inicial').length,
       });
@@ -1883,7 +1884,7 @@ Como você age:
       const limpar = () => { if (confirm('Apagar toda a conversa?')) setMensagens([]); };
       const chips = ['Estou enrolando em algo','Preciso decidir uma coisa','Uma pessoa me decepcionou','Me faça uma pergunta difícil','Reality check dos meus prazos'];
 
-      const semPasso = ideias.filter(i => i.nivel!=='publicada' && (!(i.proximo||'').trim() || !i.prazo));
+      const semPasso = ideias.filter(i => !['publicada','concluida'].includes(i.nivel) && (!(i.proximo||'').trim() || !i.prazo));
       const definirPasso = (id, passo, prazo) => { setIdeias(s => s.map(i => i.id===id ? {...i, proximo:passo, prazo} : i)); toast('Próximo passo definido ✓'); };
 
       const confirmarNota = () => {
@@ -2148,7 +2149,7 @@ Como você age:
       const moverNivel = (id, nivel) => setIdeias(s => s.map(i => i.id===id ? {...i, nivel} : i));
 
       const lembretes = useMemo(() =>
-        ideias.filter(i => i.prazo && i.nivel!=='publicada')
+        ideias.filter(i => i.prazo && !['publicada','concluida'].includes(i.nivel))
               .sort((a,b)=> a.prazo.localeCompare(b.prazo)), [ideias]);
       const atrasados = lembretes.filter(i => diffDias(i.prazo) < 0).length;
 
@@ -2290,7 +2291,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
 
       const stats = useMemo(()=>({
         total: ideias.length,
-        prontas: ideias.filter(i=>i.nivel==='pronta'||i.nivel==='publicada').length,
+        prontas: ideias.filter(i=>['pronta','publicada','concluida'].includes(i.nivel)).length,
         pesquisa: ideias.filter(i=>i.nivel==='pesquisa').length,
       }), [ideias]);
 
