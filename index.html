@@ -2125,7 +2125,7 @@ Como você age:
     };
 
     const CURTO_JARDIM = ['Semente','Broto','Muda','Plantinha','Botão','Tulipa','Campo'];
-    function JardimArena({ idx, destaque, grande }) {
+    function JardimArena({ idx, destaque, grande, onVer }) {
       const tam = (atual, reached) => atual ? (grande?'3rem':'2.3rem') : reached ? (grande?'1.9rem':'1.5rem') : (grande?'1.5rem':'1.2rem');
       return (
         <div className="jardim-cena relative rounded-2xl overflow-hidden border border-brand-200">
@@ -2134,7 +2134,8 @@ Como você age:
             {NIVEIS_JARDIM.map((n,i) => {
               const reached = i <= idx, atual = i === idx;
               return (
-                <div key={i} className="flex-1 flex flex-col items-center justify-end min-w-0">
+                <button key={i} type="button" onClick={onVer?()=>onVer(i):undefined} title={onVer?`Ver o vídeo: ${n.nome}`:undefined}
+                  className={`flex-1 flex flex-col items-center justify-end min-w-0 bg-transparent border-0 p-0 ${onVer?'cursor-pointer hover:opacity-90':''}`}>
                   <div className={`leading-none ${atual ? (destaque?'fase-cresce':'balanca') : ''}`}
                        style={{ fontSize: tam(atual, reached), filter: reached?'none':'grayscale(1)', opacity: reached?1:.4, transition:'all .3s' }}>
                     {n.emoji}
@@ -2142,7 +2143,7 @@ Como você age:
                   <div className={`mt-1 text-center leading-tight break-words w-full ${grande?'text-[10px]':'text-[9px]'} ${atual?'font-bold text-plum-700':'text-brand-400'}`}>
                     {CURTO_JARDIM[i]}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -2151,7 +2152,7 @@ Como você age:
       );
     }
 
-    function GamificacaoPanel({ pontos, jardim, streak, conquistas }) {
+    function GamificacaoPanel({ pontos, jardim, streak, conquistas, onVerFase }) {
       const ganhas = conquistas.filter(c=>c.ok).length;
       return (
         <div className="mb-5 bg-white rounded-2xl border border-brand-200 shadow-sm p-5" data-anim>
@@ -2176,7 +2177,8 @@ Como você age:
             </div>
           </div>
           <div className="mt-4">
-            <JardimArena idx={jardim.idx} />
+            <JardimArena idx={jardim.idx} onVer={onVerFase} />
+            <div className="mt-1.5 text-center text-[11px] text-brand-400">🎬 Toque numa fase para assistir o vídeo</div>
           </div>
           <div className="mt-4">
             <div className="text-xs font-semibold uppercase tracking-wide text-brand-500 mb-2">Conquistas · {ganhas}/{conquistas.length}</div>
@@ -2194,7 +2196,7 @@ Como você age:
     }
 
     /* tela de efeitos — passagem de fase */
-    function LevelUpOverlay({ nivel, fase, idx, pontos, onFechar }) {
+    function LevelUpOverlay({ nivel, fase, idx, pontos, preview, onFechar }) {
       const vref = React.useRef(null);
       const [show, setShow] = React.useState(false);
       React.useEffect(() => {
@@ -2219,11 +2221,11 @@ Como você age:
           <div className="absolute left-0 right-0 bottom-0 bg-black" style={{height:'7%'}}></div>
           <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(120% 90% at 50% 42%, transparent 50%, rgba(0,0,0,.6))'}}></div>
           <div className={`absolute left-0 right-0 text-center px-4 transition-opacity duration-700 ${show?'opacity-100':'opacity-0'}`} style={{top:'9.5%', pointerEvents:'none'}}>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90" style={{textShadow:'0 1px 8px #000'}}>Fase {fase} desbloqueada</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90" style={{textShadow:'0 1px 8px #000'}}>{preview ? `Fase ${fase} · ${nivel.nome}` : `Fase ${fase} desbloqueada`}</div>
           </div>
           <div className={`absolute left-0 right-0 text-center px-6 transition-all duration-700 ${show?'opacity-100 translate-y-0':'opacity-0 translate-y-3'}`} style={{bottom:'11%'}}>
             <h2 className="font-serif text-4xl text-white leading-tight" style={{textShadow:'0 2px 16px rgba(0,0,0,.85)'}}>{nivel.emoji} {nivel.nome}</h2>
-            <p className="text-sm text-white/90 mt-2" style={{textShadow:'0 1px 8px #000'}}>Seu jardim cresceu — {pontos} pontos 🌷</p>
+            <p className="text-sm text-white/90 mt-2" style={{textShadow:'0 1px 8px #000'}}>{preview ? 'Sua jornada do jardim 🌷' : `Seu jardim cresceu — ${pontos} pontos 🌷`}</p>
             <button onClick={(e)=>{e.stopPropagation(); onFechar();}} className="mt-5 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-lg">Continuar 🌷</button>
           </div>
           <div className="absolute bottom-2 right-3 text-[10px] text-white/45" style={{pointerEvents:'none'}}>toque para pular</div>
@@ -2574,7 +2576,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
             {aba==='ideias' ? (
               <>
                 {/* GAMIFICAÇÃO */}
-                <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} />
+                <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} onVerFase={(i)=>setLevelUp({nivel:NIVEIS_JARDIM[i], fase:i+1, preview:true})} />
 
                 {/* LEMBRETES */}
                 {lembretes.length>0 &&
@@ -2752,7 +2754,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                       </div>
                       <button onClick={()=>setModal('nova')} className="shrink-0 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2.5 rounded-xl transition shadow-sm">+ Nova ideia</button>
                     </div>
-                    <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} />
+                    <GamificacaoPanel pontos={pontos} jardim={jardim} streak={streak} conquistas={conquistas} onVerFase={(i)=>setLevelUp({nivel:NIVEIS_JARDIM[i], fase:i+1, preview:true})} />
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {cards.map((c,i)=>(
                         <div key={i} className={`bg-white rounded-2xl border p-4 shadow-sm ${c.alerta?'border-red-200':'border-brand-200'}`}>
@@ -2932,7 +2934,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
             Seus dados ficam salvos apenas neste computador (neste navegador). Use <strong>Exportar backup</strong> regularmente.
           </footer>
 
-          {levelUp && <LevelUpOverlay nivel={levelUp.nivel} fase={levelUp.fase} idx={levelUp.fase-1} pontos={pontos} onFechar={()=>setLevelUp(null)} />}
+          {levelUp && <LevelUpOverlay nivel={levelUp.nivel} fase={levelUp.fase} idx={levelUp.fase-1} pontos={pontos} preview={levelUp.preview} onFechar={()=>setLevelUp(null)} />}
           {toastNode}
         </div>
       );
