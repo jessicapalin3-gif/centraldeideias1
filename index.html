@@ -2040,14 +2040,15 @@ Como você age:
     /* ============================== GAMIFICAÇÃO (🌱 Jardim) ============================== */
 
     const NIVEIS_JARDIM = [
-      { min:0,    nome:'Semente',            emoji:'🌰' },
+      { min:0,    nome:'Semente',            emoji:'🫘' },
       { min:60,   nome:'Broto',              emoji:'🌱' },
       { min:160,  nome:'Muda',               emoji:'🌿' },
       { min:360,  nome:'Plantinha',          emoji:'🪴' },
-      { min:700,  nome:'Árvore',             emoji:'🌳' },
-      { min:1200, nome:'Jardim em flor',     emoji:'🌸' },
-      { min:2200, nome:'Jardim exuberante',  emoji:'🏡' },
+      { min:700,  nome:'Botão',              emoji:'🌷' },
+      { min:1200, nome:'Tulipa',            emoji:'🌷' },
+      { min:2200, nome:'Campo de tulipas',   emoji:'🌷' },
     ];
+    const VIDEO_FASE = ['fase1.mp4','fase2.mp4','fase3.mp4','fase4.mp4','fase5.mp4','fase6.mp4','fase7.mp4'];
     const _nivIdx = { inicial:0, pesquisa:1, estruturada:2, pronta:3, publicada:4, concluida:5 };
 
     const pontosDe = (ideias, livros, refs) => {
@@ -2123,7 +2124,7 @@ Como você age:
       return Math.max(0, pontos - base);
     };
 
-    const CURTO_JARDIM = ['Semente','Broto','Muda','Plantinha','Árvore','Em flor','Exuberante'];
+    const CURTO_JARDIM = ['Semente','Broto','Muda','Plantinha','Botão','Tulipa','Campo'];
     function JardimArena({ idx, destaque, grande }) {
       const tam = (atual, reached) => atual ? (grande?'3rem':'2.3rem') : reached ? (grande?'1.9rem':'1.5rem') : (grande?'1.5rem':'1.2rem');
       return (
@@ -2194,21 +2195,38 @@ Como você age:
 
     /* tela de efeitos — passagem de fase */
     function LevelUpOverlay({ nivel, fase, idx, pontos, onFechar }) {
+      const vref = React.useRef(null);
+      const [show, setShow] = React.useState(false);
       React.useEffect(() => {
         const onKey = (e) => { if (e.key === 'Escape' || e.key === 'Enter') onFechar(); };
         window.addEventListener('keydown', onKey);
-        const t = setTimeout(onFechar, 8000);
-        return () => { window.removeEventListener('keydown', onKey); clearTimeout(t); };
+        return () => window.removeEventListener('keydown', onKey);
+      }, []);
+      React.useEffect(() => {
+        const v = vref.current;
+        const onTime = () => { if (v && v.duration && v.currentTime >= v.duration*0.6) setShow(true); };
+        const onEnd = () => { setShow(true); setTimeout(onFechar, 4500); };
+        if (v) { v.addEventListener('timeupdate', onTime); v.addEventListener('ended', onEnd); const p=v.play&&v.play(); if(p&&p.catch)p.catch(()=>{}); }
+        const tShow = setTimeout(()=>setShow(true), 7000);   // mostra o título mesmo se o vídeo demorar
+        const tSafe = setTimeout(onFechar, 16000);           // segurança: fecha sozinho
+        return () => { if(v){v.removeEventListener('timeupdate',onTime);v.removeEventListener('ended',onEnd);} clearTimeout(tShow); clearTimeout(tSafe); };
       }, []);
       return (
-        <div onClick={onFechar} className="fixed inset-0 z-[60] flex items-center justify-center overflow-hidden bg-brand-900/70 backdrop-blur-sm p-4" style={{cursor:'pointer'}}>
-          <div onClick={(e)=>e.stopPropagation()} className="pop relative text-center bg-white rounded-3xl border-2 px-6 py-8 shadow-2xl max-w-md w-full" style={{borderColor:'#c9a44a', cursor:'default'}}>
-            <div className="text-xs font-semibold uppercase tracking-[0.2em] text-plum-600">Fase {fase} desbloqueada!</div>
-            <h2 className="font-serif text-3xl text-brand-900 mt-1 mb-4">{nivel.emoji} {nivel.nome}</h2>
-            <JardimArena idx={idx} destaque grande />
-            <p className="text-sm text-brand-600 mt-4">Seu jardim cresceu! Você chegou a <span className="font-bold text-plum-700">{pontos} pontos</span> com o seu trabalho constante. 🌱</p>
-            <button onClick={onFechar} className="mt-5 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-sm">Continuar 🌿</button>
+        <div onClick={onFechar} className="fixed inset-0 z-[60] overflow-hidden bg-black" style={{cursor:'pointer'}}>
+          <video ref={vref} src={VIDEO_FASE[idx]} muted playsInline autoPlay preload="auto"
+                 className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute left-0 right-0 top-0 bg-black" style={{height:'7%'}}></div>
+          <div className="absolute left-0 right-0 bottom-0 bg-black" style={{height:'7%'}}></div>
+          <div className="absolute inset-0 pointer-events-none" style={{background:'radial-gradient(120% 90% at 50% 42%, transparent 50%, rgba(0,0,0,.6))'}}></div>
+          <div className={`absolute left-0 right-0 text-center px-4 transition-opacity duration-700 ${show?'opacity-100':'opacity-0'}`} style={{top:'9.5%', pointerEvents:'none'}}>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/90" style={{textShadow:'0 1px 8px #000'}}>Fase {fase} desbloqueada</div>
           </div>
+          <div className={`absolute left-0 right-0 text-center px-6 transition-all duration-700 ${show?'opacity-100 translate-y-0':'opacity-0 translate-y-3'}`} style={{bottom:'11%'}}>
+            <h2 className="font-serif text-4xl text-white leading-tight" style={{textShadow:'0 2px 16px rgba(0,0,0,.85)'}}>{nivel.emoji} {nivel.nome}</h2>
+            <p className="text-sm text-white/90 mt-2" style={{textShadow:'0 1px 8px #000'}}>Seu jardim cresceu — {pontos} pontos 🌷</p>
+            <button onClick={(e)=>{e.stopPropagation(); onFechar();}} className="mt-5 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-6 py-2.5 rounded-xl transition shadow-lg">Continuar 🌷</button>
+          </div>
+          <div className="absolute bottom-2 right-3 text-[10px] text-white/45" style={{pointerEvents:'none'}}>toque para pular</div>
         </div>
       );
     }
