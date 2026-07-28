@@ -383,6 +383,7 @@ Tema: {{IDEIA}}`
     const idbDel = async (key) => { const db = await idb(); return new Promise((res, rej) => { const tx = db.transaction(STORE_ANEXOS,'readwrite'); tx.objectStore(STORE_ANEXOS).delete(key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); };
     const abrirAnexo = async (anexo, onErro) => {
       try {
+        await garantirAnexoLocal(anexo);
         const blob = await idbGet(anexo.id);
         if (!blob) { onErro && onErro(); return; }
         const url = URL.createObjectURL(blob);
@@ -1419,6 +1420,7 @@ Como você age:
       });
       const [tagsText, setTagsText] = useState((inicial?.tags||[]).join(', '));
       const fileRef = useRef();
+      const [subindoAnexo, setSubindoAnexo] = useState(false);
       const set = (k,v) => setF(s => ({...s, [k]:v}));
       const toggle = (k,v) => setF(s => ({...s, [k]: s[k].includes(v) ? s[k].filter(x=>x!==v) : [...s[k], v]}));
 
@@ -1426,8 +1428,20 @@ Como você age:
         if (!file) return;
         if (file.size > 80*1024*1024) { alert('Arquivo muito grande (máximo ~80 MB).'); return; }
         const id = uid();
-        try { await idbSet(id, file); set('anexo', { id, nome:file.name, tipo:file.type, tamanho:file.size }); }
-        catch { alert('Não foi possível anexar o arquivo.'); }
+        const meta = { id, nome:file.name, tipo:file.type, tamanho:file.size };
+        try { await idbSet(id, file); }
+        catch { alert('Não foi possível anexar o arquivo.'); return; }
+        set('anexo', meta);
+        // envia pra nuvem (se o sync estiver ativo) para ficar disponível em outros aparelhos
+        const cfg = carregarSync();
+        if (cfg.ativo && cfg.token) {
+          setSubindoAnexo(true);
+          try {
+            const sha = await ghPutAnexo(cfg, `anexos/${id}`, file);
+            setF(s => (s.anexo && s.anexo.id===id) ? {...s, anexo:{...s.anexo, cloudSha:sha}} : s);
+          } catch (e) { /* fica só local; a migração tenta enviar depois */ }
+          setSubindoAnexo(false);
+        }
       };
 
       const submit = () => {
@@ -1505,7 +1519,11 @@ Como você age:
               onChange={e=>{ const file=e.target.files[0]; escolherArquivo(file); e.target.value=''; }} />
             {f.anexo ? (
               <div className="flex items-center gap-2 rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm">
-                <span className="truncate">📎 {f.anexo.nome} <span className="text-brand-400">({formatarTamanho(f.anexo.tamanho)})</span></span>
+                <span className="truncate">📎 {f.anexo.nome} <span className="text-brand-400">({formatarTamanho(f.anexo.tamanho)})</span>
+                  {subindoAnexo ? <span className="ml-1 text-brand-400">☁️ enviando…</span>
+                    : f.anexo.cloudSha ? <span className="ml-1 text-emerald-600">☁️ na nuvem</span>
+                    : <span className="ml-1 text-brand-400">salvo neste aparelho</span>}
+                </span>
                 <div className="ml-auto flex gap-3 shrink-0">
                   <button type="button" onClick={()=>abrirAnexo(f.anexo, ()=>alert('Arquivo não encontrado.'))} className="text-plum-600 hover:text-plum-700 font-medium">Abrir</button>
                   <button type="button" onClick={()=>fileRef.current.click()} className="text-brand-600 hover:text-brand-800 font-medium">Trocar</button>
@@ -1515,7 +1533,7 @@ Como você age:
             ) : (
               <button type="button" onClick={()=>fileRef.current.click()} className="px-3 py-2 rounded-xl border border-dashed border-brand-300 text-brand-600 hover:bg-brand-100 transition text-sm">📎 Anexar arquivo</button>
             )}
-            <p className="mt-1 text-xs text-brand-400">O arquivo fica salvo neste navegador (não entra no backup .json).</p>
+            <p className="mt-1 text-xs text-brand-400">Com a ☁️ Nuvem ligada, o arquivo é enviado e fica disponível nos seus outros aparelhos. (Não entra no backup .json.)</p>
           </div>
 
           <div>
@@ -1587,12 +1605,15 @@ Como você age:
       const [url, setUrl] = useState(null);
       const [erro, setErro] = useState(false);
       useEffect(() => {
-        let u;
-        idbGet(anexo.id).then(blob => {
+        let u, cancel = false;
+        (async () => {
+          await garantirAnexoLocal(anexo);
+          const blob = await idbGet(anexo.id);
+          if (cancel) return;
           if (!blob) { setErro(true); return; }
           u = URL.createObjectURL(blob); setUrl(u);
-        }).catch(() => setErro(true));
-        return () => { if (u) URL.revokeObjectURL(u); };
+        })().catch(() => { if (!cancel) setErro(true); });
+        return () => { cancel = true; if (u) URL.revokeObjectURL(u); };
       }, [anexo.id]);
 
       const ehImg = (anexo.tipo||'').startsWith('image/');
@@ -1652,6 +1673,29 @@ Como você age:
           if (!q) return true;
           return [r.titulo,r.autor,r.fonte,r.trecho,r.notas,(r.tags||[]).join(' ')].join(' ').toLowerCase().includes(q);
         }), [refs, filtroTipo, filtroCat, busca, filtroIdeia]);
+
+      // migração: envia pra nuvem os anexos que ainda só existem neste aparelho
+      const anexosTentados = useRef(new Set());
+      useEffect(() => {
+        const cfg = carregarSync();
+        if (!cfg.ativo || !cfg.token) return;
+        let cancel = false;
+        (async () => {
+          for (const r of refs) {
+            if (cancel) break;
+            const a = r.anexo;
+            if (!a || !a.id || a.cloudSha || anexosTentados.current.has(a.id)) continue;
+            anexosTentados.current.add(a.id);
+            try {
+              const blob = await idbGet(a.id);
+              if (!blob) continue; // não está neste aparelho (veio de outro) — nada a enviar
+              const sha = await ghPutAnexo(cfg, `anexos/${a.id}`, blob);
+              if (!cancel) setRefs(s => s.map(x => x.id===r.id ? {...x, anexo:{...x.anexo, cloudSha:sha}} : x));
+            } catch {}
+          }
+        })();
+        return () => { cancel = true; };
+      }, [refs]);
 
       return (
         <div data-anim>
@@ -2041,6 +2085,52 @@ Como você age:
       if (!r.ok) throw new Error('Falha ao salvar ('+r.status+')');
       const data = await r.json();
       return data.content.sha;
+    };
+
+    /* ---- anexos na nuvem (mesmo repositório privado do sync, pasta anexos/) ---- */
+    const blobParaB64 = (blob) => new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onload = () => res(((fr.result||'')+'').split(',')[1] || '');
+      fr.onerror = () => rej(fr.error);
+      fr.readAsDataURL(blob);
+    });
+    const b64ParaBlob = (b64, tipo) => {
+      const bin = atob((b64||'').replace(/\s/g,''));
+      const arr = new Uint8Array(bin.length);
+      for (let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      return new Blob([arr], { type: tipo || 'application/octet-stream' });
+    };
+    const ghPutAnexo = async (cfg, path, blob) => {
+      const content = await blobParaB64(blob);
+      let sha = '';
+      try { const g = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, { headers: ghHeaders(cfg.token), cache:'no-store' }); if (g.ok) sha = (await g.json()).sha; } catch {}
+      const body = { message:'Jardim de Ideias — anexo', content };
+      if (sha) body.sha = sha;
+      const r = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`, {
+        method:'PUT', headers:{...ghHeaders(cfg.token), 'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error('Falha ao enviar anexo ('+r.status+')');
+      const data = await r.json();
+      return data.content.sha;
+    };
+    const ghGetAnexo = async (cfg, sha) => {
+      const r = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/git/blobs/${sha}`, { headers: ghHeaders(cfg.token), cache:'no-store' });
+      if (!r.ok) throw new Error('Falha ao baixar anexo ('+r.status+')');
+      const data = await r.json();
+      return data.content; // base64
+    };
+    // garante que o blob do anexo está no IndexedDB local; baixa da nuvem se preciso. Retorna true se disponível.
+    const garantirAnexoLocal = async (anexo) => {
+      if (!anexo || !anexo.id) return false;
+      try { const b = await idbGet(anexo.id); if (b) return true; } catch {}
+      if (!anexo.cloudSha) return false;
+      const cfg = carregarSync();
+      if (!cfg.ativo || !cfg.token) return false;
+      try {
+        const b64 = await ghGetAnexo(cfg, anexo.cloudSha);
+        await idbSet(anexo.id, b64ParaBlob(b64, anexo.tipo));
+        return true;
+      } catch { return false; }
     };
 
     /* ============================== GAMIFICAÇÃO (🌱 Jardim) ============================== */
