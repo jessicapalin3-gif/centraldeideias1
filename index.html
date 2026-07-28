@@ -2239,6 +2239,90 @@ Como você age:
       );
     }
 
+    /* ============================== AGENDA (Google Calendar) ============================== */
+    const LS_AGENDA = 'central_ideias_agenda_v1';
+    const agendaPadrao = { src: 'jessicapalin3@gmail.com', modo: 'AGENDA' };
+    const carregarAgenda = () => { try { return Object.assign({}, agendaPadrao, JSON.parse(localStorage.getItem(LS_AGENDA))||{}); } catch { return {...agendaPadrao}; } };
+    // Aceita: e-mail puro, URL de incorporar, ou o código <iframe ... src="...">
+    const extrairSrc = (txt) => {
+      if (!txt) return '';
+      txt = txt.trim();
+      const mIframe = txt.match(/src=["']([^"']+)["']/i);
+      if (mIframe) {
+        try { const u = new URL(mIframe[1]); return u.searchParams.get('src') || mIframe[1]; } catch { return mIframe[1]; }
+      }
+      if (/^https?:\/\//i.test(txt)) {
+        try { const u = new URL(txt); return u.searchParams.get('src') || txt; } catch { return txt; }
+      }
+      return txt; // e-mail / id puro
+    };
+
+    function AgendaTab() {
+      const [cfg, setCfg] = useState(carregarAgenda);
+      const [rascunho, setRascunho] = useState('');
+      const [editar, setEditar] = useState(false);
+      useEffect(() => { try { localStorage.setItem(LS_AGENDA, JSON.stringify(cfg)); } catch {} }, [cfg]);
+
+      const embedUrl = React.useMemo(() => {
+        const src = encodeURIComponent(cfg.src || '');
+        return `https://calendar.google.com/calendar/embed?src=${src}&ctz=America%2FSao_Paulo&mode=${cfg.modo}&wkst=1&hl=pt_BR&showTitle=0&showPrint=0&showCalendars=0&showTz=0`;
+      }, [cfg.src, cfg.modo]);
+
+      const salvar = () => {
+        const novo = extrairSrc(rascunho);
+        if (novo) setCfg(c => ({...c, src: novo}));
+        setEditar(false); setRascunho('');
+      };
+
+      const modos = [['AGENDA','Lista'], ['WEEK','Semana'], ['MONTH','Mês']];
+
+      return (
+        <div>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-serif text-2xl text-brand-900">📅 Minha Agenda</h2>
+              <p className="text-sm text-brand-600">Sua Google Agenda aqui dentro. <span className="text-brand-400">({cfg.src})</span></p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex rounded-xl bg-brand-100 p-0.5">
+                {modos.map(([m,label]) =>
+                  <button key={m} onClick={()=>setCfg(c=>({...c, modo:m}))}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${cfg.modo===m?'bg-white text-brand-900 shadow-sm':'text-brand-500 hover:text-brand-700'}`}>{label}</button>)}
+              </div>
+              <a href="https://calendar.google.com/calendar/u/0/r/eventedit" target="_blank" rel="noopener"
+                className="px-3 py-1.5 rounded-xl bg-plum-600 hover:bg-plum-700 text-white text-sm font-semibold transition">+ Novo evento</a>
+              <button onClick={()=>{ setRascunho(''); setEditar(v=>!v); }}
+                className="px-3 py-1.5 rounded-xl bg-white border border-brand-200 text-brand-600 hover:bg-brand-50 text-sm font-semibold transition">⚙️ Trocar agenda</button>
+            </div>
+          </div>
+
+          {editar && (
+            <div className="mb-4 rounded-2xl border border-brand-200 bg-brand-50 p-4">
+              <label className="block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">E-mail da agenda, link de incorporar ou código &lt;iframe&gt;</label>
+              <input value={rascunho} onChange={e=>setRascunho(e.target.value)} placeholder="seuemail@gmail.com"
+                className="w-full rounded-xl border border-brand-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300" />
+              <p className="text-xs text-brand-500 mt-2 leading-relaxed">
+                No Google Agenda (computador): <strong>Configurações → sua agenda → Integrar agenda</strong> e copie o <strong>ID da agenda</strong> ou o <strong>código de incorporação</strong>. Cole aqui.
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button onClick={salvar} className="bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl text-sm transition">Salvar</button>
+                <button onClick={()=>{setEditar(false); setRascunho('');}} className="text-brand-500 hover:text-brand-700 px-4 py-2 text-sm">Cancelar</button>
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-2xl overflow-hidden border border-brand-200 bg-white shadow-sm">
+            <iframe src={embedUrl} title="Google Agenda" className="w-full" style={{height:'70vh', minHeight:'480px', border:0}} loading="lazy" />
+          </div>
+
+          <div className="mt-3 flex items-start gap-2 text-xs text-brand-500 leading-relaxed">
+            <span>ℹ️</span>
+            <p>Se aparecer vazio ou pedindo login, é porque você precisa estar conectada na <strong>mesma conta Google</strong> neste navegador — ou a agenda precisa estar compartilhada como pública. No iPhone, alguns bloqueios de cookie podem impedir a visualização; nesse caso use <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener" className="text-plum-600 underline">abrir no Google Agenda</a>.</p>
+          </div>
+        </div>
+      );
+    }
+
     /* ============================== APP ============================== */
 
     function App() {
@@ -2578,6 +2662,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
               <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0">
                 {tabBtn('ideias','💡 Minhas Ideias')}
                 {tabBtn('painel','📊 Painel')}
+                {tabBtn('agenda','📅 Agenda')}
                 {tabBtn('mentor','🧭 Mentor')}
                 {tabBtn('prompts','✍️ Biblioteca de Prompts')}
                 {tabBtn('refs','📚 Referências')}
@@ -2827,6 +2912,8 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                   </div>
                 );
               })()
+            ) : aba==='agenda' ? (
+              <AgendaTab />
             ) : aba==='mentor' ? (
               <ChatMentor ideias={ideias} setIdeias={setIdeias} toast={toast} />
             ) : aba==='refs' ? (
