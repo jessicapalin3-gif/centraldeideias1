@@ -2371,6 +2371,82 @@ Como você age:
       );
     }
 
+    /* ============================== BIBLIOTECA DE CATEGORIAS (arquivo de concluídas) ============================== */
+    function CategoriasTab({ ideias = [], onEnviarLivro, onAbrir }) {
+      const [cat, setCat] = useState('todas');
+
+      // arquivo = ideias concluídas (a "pasta" de cada ideia finalizada)
+      const arquivadas = React.useMemo(() =>
+        ideias.filter(i => i.nivel === 'concluida')
+              .sort((a,b) => (a.nome||'').localeCompare(b.nome||'', 'pt')), [ideias]);
+
+      const porCat = React.useMemo(() => {
+        const m = {};
+        arquivadas.forEach(i => { (m[i.categoria] = m[i.categoria] || []).push(i); });
+        return m;
+      }, [arquivadas]);
+
+      const catsComItens = CATEGORIAS.filter(c => (porCat[c.id] || []).length);
+      const lista = cat === 'todas' ? arquivadas : (porCat[cat] || []);
+
+      return (
+        <div>
+          <div className="mb-4">
+            <h2 className="font-serif text-2xl text-brand-900">📂 Biblioteca de Categorias</h2>
+            <p className="text-sm text-brand-600">Arquivo das suas ideias concluídas. Escolha uma categoria, revisite e puxe a ideia pra um capítulo do livro.</p>
+          </div>
+
+          {arquivadas.length === 0 ? (
+            <div className="rounded-2xl border border-brand-200 bg-white shadow-sm p-8 text-center">
+              <div className="text-4xl mb-2">🌾</div>
+              <p className="text-brand-700 font-medium">Nenhuma ideia concluída ainda.</p>
+              <p className="text-sm text-brand-500 mt-1">Ao concluir uma tarefa (botão <strong>✓ Concluir tarefa</strong> na ideia), ela é arquivada aqui por categoria.</p>
+            </div>
+          ) : (
+            <>
+              {/* seletor de categorias (pastas) */}
+              <div className="flex flex-wrap gap-2 mb-5">
+                <button onClick={()=>setCat('todas')}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${cat==='todas'?'bg-brand-900 text-white shadow':'bg-white border border-brand-200 text-brand-600 hover:bg-brand-50'}`}>
+                  🗂️ Todas <span className="opacity-70">({arquivadas.length})</span>
+                </button>
+                {catsComItens.map(c => (
+                  <button key={c.id} onClick={()=>setCat(c.id)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-semibold transition ${cat===c.id?'bg-brand-900 text-white shadow':'bg-white border border-brand-200 text-brand-600 hover:bg-brand-50'}`}>
+                    {c.emoji} {c.curto} <span className="opacity-70">({(porCat[c.id]||[]).length})</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* cards das ideias arquivadas */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {lista.map(i => {
+                  const c = catById(i.categoria);
+                  return (
+                    <div key={i.id} className="rounded-2xl border border-brand-200 bg-white shadow-sm p-4 flex flex-col">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-lg">{c.emoji}</span>
+                        <span className="text-xs text-brand-400 truncate">{c.curto}{i.projeto?` · ${i.projeto}`:''}</span>
+                        <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300 shrink-0">✓ Concluída</span>
+                      </div>
+                      <h3 className="font-semibold text-brand-900 leading-snug">{i.nome}</h3>
+                      {(i.problema || i.proximo) && <p className="text-sm text-brand-500 mt-1 line-clamp-3">{i.problema || i.proximo}</p>}
+                      <div className="flex gap-2 mt-3 pt-1">
+                        <button onClick={()=>onEnviarLivro(i)}
+                          className="flex-1 bg-plum-600 hover:bg-plum-700 text-white text-sm font-semibold py-2 rounded-xl transition">📖 Enviar ao livro</button>
+                        <button onClick={()=>onAbrir(i)}
+                          className="px-3 py-2 rounded-xl border border-brand-200 text-brand-700 hover:bg-brand-100 text-sm font-semibold transition">Abrir</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
     /* ============================== APP ============================== */
 
     function App() {
@@ -2714,6 +2790,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                 {tabBtn('mentor','🧭 Mentor')}
                 {tabBtn('prompts','✍️ Biblioteca de Prompts')}
                 {tabBtn('refs','📚 Referências')}
+                {tabBtn('categorias','📂 Categorias')}
                 {tabBtn('livro','📖 Livro')}
               </div>
               {aba==='ideias' &&
@@ -2962,6 +3039,8 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
               })()
             ) : aba==='agenda' ? (
               <AgendaTab ideias={ideias} />
+            ) : aba==='categorias' ? (
+              <CategoriasTab ideias={ideias} onEnviarLivro={setEnviarLivro} onAbrir={irIdeia} />
             ) : aba==='mentor' ? (
               <ChatMentor ideias={ideias} setIdeias={setIdeias} toast={toast} />
             ) : aba==='refs' ? (
