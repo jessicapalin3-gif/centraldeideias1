@@ -1898,7 +1898,7 @@ Forma:
       const [verCfg, setVerCfg] = useState(false);
       const [salvarNota, setSalvarNota] = useState(null); // {texto} | null
       const [notaIdeiaId, setNotaIdeiaId] = useState(ideias[0]?.id || '');
-      const [cfg, setCfg] = useState(() => { try { return Object.assign({usarIA:false, key:'', model:'claude-3-5-sonnet-20241022'}, JSON.parse(localStorage.getItem('central_ideias_chat_cfg_v1'))||{}); } catch { return {usarIA:false, key:'', model:'claude-3-5-sonnet-20241022'}; } });
+      const [cfg, setCfg] = useState(() => { try { const s = Object.assign({usarIA:false, key:'', model:'claude-sonnet-5'}, JSON.parse(localStorage.getItem('central_ideias_chat_cfg_v1'))||{}); if (!s.model || s.model==='claude-3-5-sonnet-20241022') s.model='claude-sonnet-5'; return s; } catch { return {usarIA:false, key:'', model:'claude-sonnet-5'}; } });
       const fimRef = useRef();
 
       useEffect(() => { try { localStorage.setItem('central_ideias_chat_v1', JSON.stringify(mensagens)); } catch {} }, [mensagens]);
@@ -1924,7 +1924,7 @@ Forma:
         const resp = await fetch('https://api.anthropic.com/v1/messages', {
           method:'POST',
           headers:{ 'content-type':'application/json', 'x-api-key':cfg.key, 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-          body: JSON.stringify({ model: cfg.model||'claude-3-5-sonnet-20241022', max_tokens:600, system: construirSistema(ctx()), messages: msgs.map(m=>({role:m.role, content:m.texto})) })
+          body: JSON.stringify({ model: cfg.model||'claude-sonnet-5', max_tokens:1000, thinking:{type:'disabled'}, system: construirSistema(ctx()), messages: msgs.map(m=>({role:m.role, content:m.texto})) })
         });
         if (!resp.ok) throw new Error((await resp.text()).slice(0,160));
         const data = await resp.json();
@@ -1989,9 +1989,10 @@ Forma:
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wide text-brand-600 mb-1.5">Modelo</label>
-                <input className={campoCls} value={cfg.model} onChange={e=>setCfg(c=>({...c, model:e.target.value}))} placeholder="claude-3-5-sonnet-20241022" />
+                <input className={campoCls} value={cfg.model} onChange={e=>setCfg(c=>({...c, model:e.target.value}))} placeholder="claude-sonnet-5" />
+                <p className="text-xs text-brand-400 mt-1">Sugestões: <button type="button" onClick={()=>setCfg(c=>({...c, model:'claude-sonnet-5'}))} className="text-plum-600 hover:underline">claude-sonnet-5</button> (equilíbrio) · <button type="button" onClick={()=>setCfg(c=>({...c, model:'claude-haiku-4-5'}))} className="text-plum-600 hover:underline">claude-haiku-4-5</button> (mais barato) · <button type="button" onClick={()=>setCfg(c=>({...c, model:'claude-opus-4-8'}))} className="text-plum-600 hover:underline">claude-opus-4-8</button> (mais profundo)</p>
               </div>
-              <p className="text-xs text-brand-400">Sem chave, o Mentor funciona no modo coach local (offline e grátis). Com chave, as respostas ficam mais inteligentes (a Anthropic cobra por uso). Sua chave e suas conversas ficam só neste computador. A chave é criada em console.anthropic.com.</p>
+              <p className="text-xs text-brand-400">Sem chave, o Mentor funciona no modo coach local (offline e grátis). Com chave, ele entende o que você escreve e debate de verdade (a Anthropic cobra por uso). Sua chave e suas conversas ficam só neste aparelho. A chave é criada em console.anthropic.com → Get API keys.</p>
             </div>}
 
           {semPasso.length>0 &&
