@@ -351,6 +351,10 @@ Tema: {{IDEIA}}`
     const LS_REFS = 'central_ideias_referencias_v1';
     const carregarRefs = () => { try { return JSON.parse(localStorage.getItem(LS_REFS)) || []; } catch { return []; } };
     const salvarRefs = (r) => { try { localStorage.setItem(LS_REFS, JSON.stringify(r)); } catch(e){ console.warn('Não foi possível salvar referências (limite de armazenamento).', e); } };
+
+    const LS_TEXTOS = 'central_ideias_textos_v1';
+    const carregarTextos = () => { try { return JSON.parse(localStorage.getItem(LS_TEXTOS)) || []; } catch { return []; } };
+    const salvarTextos = (t) => { try { localStorage.setItem(LS_TEXTOS, JSON.stringify(t)); } catch(e){ console.warn('Não foi possível salvar os textos (limite de armazenamento).', e); } };
     const citacaoRef = (r) => {
       const p = [];
       if (r.autor) p.push(r.autor.toUpperCase().replace(/\.+$/,'') + '.');
@@ -2623,12 +2627,132 @@ Forma:
       );
     }
 
+    /* ============================== ESCRITA (desenvolver textos) ============================== */
+    function EscritaTab({ textos = [], setTextos, ideias = [], toast, copiar, onIrIdeia, seed }) {
+      const [selId, setSelId] = useState(textos[0]?.id || null);
+      const [busca, setBusca] = useState('');
+
+      // seed = {n, id?} — abre um texto específico ou cria um novo (vindo de fora)
+      const seedN = useRef(0);
+      useEffect(() => {
+        if (seed && seed.n && seed.n !== seedN.current) {
+          seedN.current = seed.n;
+          if (seed.id) setSelId(seed.id);
+        }
+      }, [seed]);
+
+      const novo = (ideiaId = '') => {
+        const t = { id: uid(), titulo: '', corpo: '', ideiaId, criadoEm: hojeISO(), atualizadoEm: Date.now() };
+        setTextos(s => [t, ...s]);
+        setSelId(t.id);
+      };
+      const upd = (patch) => setTextos(s => s.map(t => t.id === selId ? { ...t, ...patch, atualizadoEm: Date.now() } : t));
+      const excluir = (id) => { if (confirm('Excluir este texto?')) { setTextos(s => s.filter(t => t.id !== id)); if (selId === id) setSelId(null); } };
+
+      const atual = textos.find(t => t.id === selId) || null;
+      const lista = textos
+        .filter(t => { const q = busca.trim().toLowerCase(); return !q || (t.titulo + ' ' + t.corpo).toLowerCase().includes(q); })
+        .sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+
+      const ideiaDoAtual = atual && atual.ideiaId ? ideias.find(i => i.id === atual.ideiaId) : null;
+
+      const baixarTxt = () => {
+        if (!atual) return;
+        const nome = (atual.titulo || 'texto').replace(/[^\w\-À-ÿ ]+/g, '').trim() || 'texto';
+        const blob = new Blob([(atual.titulo ? atual.titulo + '\n\n' : '') + (atual.corpo || '')], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url; a.download = `${nome}.txt`; a.click(); URL.revokeObjectURL(url);
+      };
+
+      return (
+        <div>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-serif text-2xl text-brand-900">✍️ Escrita</h2>
+              <p className="text-sm text-brand-600">Desenvolva o texto de uma ideia ou tarefa. Salva sozinho e sincroniza na nuvem.</p>
+            </div>
+            <button onClick={()=>novo()} className="shrink-0 bg-plum-600 hover:bg-plum-700 text-white font-semibold px-4 py-2 rounded-xl transition shadow-sm">+ Novo texto</button>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* lista de textos */}
+            <aside className="w-full lg:w-72 shrink-0">
+              <input value={busca} onChange={e=>setBusca(e.target.value)} placeholder="🔍 Buscar nos textos"
+                className="w-full mb-2 rounded-xl border border-brand-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300" />
+              {lista.length === 0 ? (
+                <p className="text-sm text-brand-400 px-1 py-4 text-center">Nenhum texto ainda. Toque em <strong>+ Novo texto</strong>.</p>
+              ) : (
+                <ul className="space-y-1.5 max-h-[62vh] overflow-auto pr-1">
+                  {lista.map(t => {
+                    const it = t.ideiaId ? ideias.find(i=>i.id===t.ideiaId) : null;
+                    return (
+                      <li key={t.id}>
+                        <button onClick={()=>setSelId(t.id)}
+                          className={`w-full text-left rounded-xl border px-3 py-2 transition ${selId===t.id?'border-plum-300 bg-plum-50':'border-brand-100 bg-white hover:bg-brand-50'}`}>
+                          <div className="text-sm font-medium text-brand-800 truncate">{t.titulo || 'Sem título'}</div>
+                          <div className="text-[11px] text-brand-400 flex items-center gap-1.5">
+                            <span>{contarPalavras(t.corpo)} palavras</span>
+                            {it && <span className="truncate">· {catById(it.categoria).emoji} {it.nome}</span>}
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </aside>
+
+            {/* editor */}
+            <div className="flex-1 min-w-0">
+              {!atual ? (
+                <div className="rounded-2xl border border-brand-200 bg-white shadow-sm p-8 text-center text-brand-500">
+                  <div className="text-4xl mb-2">📝</div>
+                  <p>Escolha um texto na lista ou crie um novo para começar a escrever.</p>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-brand-200 bg-white shadow-sm p-4">
+                  <input value={atual.titulo} onChange={e=>upd({titulo:e.target.value})} placeholder="Título do texto"
+                    className="w-full font-serif text-xl text-brand-900 bg-transparent border-0 border-b border-brand-100 focus:outline-none focus:border-plum-300 pb-2 mb-3" />
+
+                  <div className="flex flex-wrap items-center gap-2 mb-3 text-sm">
+                    <label className="text-brand-500">Ligar a uma ideia:</label>
+                    <select value={atual.ideiaId||''} onChange={e=>upd({ideiaId:e.target.value})}
+                      className="rounded-lg border border-brand-200 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-plum-300 max-w-[220px]">
+                      <option value="">— nenhuma —</option>
+                      {ideias.map(i => <option key={i.id} value={i.id}>{catById(i.categoria).emoji} {i.nome}</option>)}
+                    </select>
+                    {ideiaDoAtual && onIrIdeia && <button onClick={()=>onIrIdeia(ideiaDoAtual)} className="text-plum-600 hover:text-plum-800 text-xs font-semibold">abrir ideia ↗</button>}
+                    {ideiaDoAtual && !(atual.corpo||'').trim() && <button onClick={()=>upd({corpo: montarResumoIdeia(ideiaDoAtual)})} className="text-xs font-semibold text-brand-600 hover:text-brand-800 border border-brand-200 rounded-lg px-2 py-1">Puxar resumo da ideia</button>}
+                  </div>
+
+                  <textarea value={atual.corpo} onChange={e=>upd({corpo:e.target.value})}
+                    placeholder="Escreva aqui. Desenvolva a ideia, o roteiro, o artigo… sem pressa."
+                    className="w-full rounded-xl border border-brand-200 bg-white px-3 py-3 text-[15px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-plum-300"
+                    style={{minHeight:'50vh', resize:'vertical'}} />
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-3 text-sm">
+                    <span className="text-xs text-brand-400">{contarPalavras(atual.corpo)} palavras · salvo automaticamente ✓</span>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={()=>copiar((atual.titulo?atual.titulo+'\n\n':'')+(atual.corpo||''), ()=>toast('Texto copiado ✓'))} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Copiar</button>
+                      <button onClick={baixarTxt} className="px-3 py-1.5 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition font-medium">Baixar .txt</button>
+                      <button onClick={()=>excluir(atual.id)} className="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition font-medium">Excluir</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     /* ============================== APP ============================== */
 
     function App() {
       const [ideias, setIdeias] = useState(carregar);
       const [livros, setLivros] = useState(carregarLivros);
       const [refs, setRefs] = useState(carregarRefs);
+      const [textos, setTextos] = useState(carregarTextos);
       const [aba, setAba] = useState('painel'); // painel | ideias | prompts | livro | refs | mentor
       const [modal, setModal] = useState(null); // null | 'nova' | ideia(edição)
       const [filtroCat, setFiltroCat] = useState('todas');
@@ -2657,6 +2781,7 @@ Forma:
       useEffect(()=>{ salvar(ideias); }, [ideias]);
       useEffect(()=>{ salvarLivros(livros); }, [livros]);
       useEffect(()=>{ salvarRefs(refs); }, [refs]);
+      useEffect(()=>{ salvarTextos(textos); }, [textos]);
       useEffect(()=>{ salvarSyncCfg(syncCfg); }, [syncCfg]);
       useEffect(()=>{ document.documentElement.classList.toggle('dark', tema==='dark'); localStorage.setItem('central_ideias_tema', tema); }, [tema]);
 
@@ -2667,7 +2792,7 @@ Forma:
         if (pushTimer.current) clearTimeout(pushTimer.current);
         pushTimer.current = setTimeout(async () => {
           setSyncStatus('salvando');
-          const obj = { savedAt: Date.now(), ideias, livros, referencias: refs };
+          const obj = { savedAt: Date.now(), ideias, livros, referencias: refs, textos };
           try {
             const novoSha = await ghPut(cfg, obj);
             setSyncCfg(s => ({...s, sha:novoSha, savedAt:obj.savedAt}));
@@ -2691,6 +2816,7 @@ Forma:
               if (Array.isArray(r.json.ideias)) setIdeias(r.json.ideias);
               if (Array.isArray(r.json.livros)) setLivros(r.json.livros);
               if (Array.isArray(r.json.referencias)) setRefs(r.json.referencias);
+              if (Array.isArray(r.json.textos)) setTextos(r.json.textos);
               setSyncCfg(s => ({...s, sha:r.sha, savedAt:r.json.savedAt||s.savedAt}));
               setSyncStatus('ok'); syncReady.current = true;
             } else {
@@ -2709,7 +2835,7 @@ Forma:
       useEffect(() => {
         if (!syncReady.current) return;
         agendarPush(4000);
-      }, [ideias, livros, refs]);
+      }, [ideias, livros, refs, textos]);
 
       const projetos = useMemo(() =>
         Array.from(new Set(ideias.map(i=>i.projeto).filter(Boolean))).sort(), [ideias]);
@@ -2859,7 +2985,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
       }, []);
 
       const exportar = () => {
-        const backup = { tipo:'central-de-ideias-backup', versao:2, data:hojeISO(), ideias, livros, referencias:refs };
+        const backup = { tipo:'central-de-ideias-backup', versao:2, data:hojeISO(), ideias, livros, referencias:refs, textos };
         const blob = new Blob([JSON.stringify(backup,null,2)], {type:'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -2882,12 +3008,13 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
             if (Array.isArray(dados)) { // backup antigo (só ideias)
               setIdeias(prev => mesclar(prev, dados));
               toast(`${dados.length} ideia(s) importada(s) ✓`);
-            } else if (dados && (dados.ideias || dados.livros || dados.referencias)) {
+            } else if (dados && (dados.ideias || dados.livros || dados.referencias || dados.textos)) {
               setIdeias(prev => mesclar(prev, dados.ideias));
               setLivros(prev => mesclar(prev, dados.livros));
               setRefs(prev => mesclar(prev, dados.referencias));
-              const n = (dados.ideias||[]).length, l = (dados.livros||[]).length, r = (dados.referencias||[]).length;
-              toast(`Importado: ${n} ideia(s), ${l} livro(s), ${r} referência(s) ✓`);
+              setTextos(prev => mesclar(prev, dados.textos));
+              const n = (dados.ideias||[]).length, l = (dados.livros||[]).length, r = (dados.referencias||[]).length, tx = (dados.textos||[]).length;
+              toast(`Importado: ${n} ideia(s), ${l} livro(s), ${r} referência(s), ${tx} texto(s) ✓`);
             } else throw 0;
           } catch { toast('Arquivo inválido ✗'); }
         };
@@ -2967,6 +3094,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
                 {tabBtn('prompts','✍️ Biblioteca de Prompts')}
                 {tabBtn('refs','📚 Referências')}
                 {tabBtn('categorias','📂 Categorias')}
+                {tabBtn('escrita','✍️ Escrita')}
                 {tabBtn('livro','📖 Livro')}
               </div>
               {aba==='ideias' &&
@@ -3217,6 +3345,8 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
               <AgendaTab ideias={ideias} />
             ) : aba==='categorias' ? (
               <CategoriasTab ideias={ideias} onEnviarLivro={setEnviarLivro} onAbrir={irIdeia} />
+            ) : aba==='escrita' ? (
+              <EscritaTab textos={textos} setTextos={setTextos} ideias={ideias} toast={toast} copiar={copiar} onIrIdeia={irIdeia} />
             ) : aba==='mentor' ? (
               <ChatMentor ideias={ideias} setIdeias={setIdeias} toast={toast} />
             ) : aba==='refs' ? (
