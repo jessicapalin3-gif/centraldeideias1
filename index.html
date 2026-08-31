@@ -3010,7 +3010,17 @@ Forma:
     }
 
     /* ============================== ESCRITA (desenvolver textos) ============================== */
-    function RichEditor({ value, onChange }) {
+    // texto de uma referencia -> HTML pronto para entrar no editor
+    const escaparHTML = (s) => (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+    function htmlDaReferencia(r, comFonte) {
+      const corpo = (r.trecho||'').split(/\n+/).filter(l => l.trim())
+        .map(l => '<p>' + escaparHTML(l.trim()) + '</p>').join('');
+      if (!comFonte) return corpo + '<p><br></p>';
+      const credito = [r.titulo, r.autor, r.fonte].filter(Boolean).map(escaparHTML).join(' — ');
+      return '<p><strong>' + credito + '</strong></p>' + corpo + '<p><br></p>';
+    }
+
+    function RichEditor({ value, onChange, refs = [] }) {
       const ref = useRef();
       useEffect(() => { if (ref.current && (value||'') !== ref.current.innerHTML) ref.current.innerHTML = value || ''; }, [value]);
       const sync = () => { if (ref.current) onChange(ref.current.innerHTML); };
@@ -3018,6 +3028,58 @@ Forma:
       const vazio = !textoPuro(value);
       const btn = "px-2.5 py-1 rounded-lg border border-brand-200 text-brand-700 hover:bg-brand-100 transition text-sm";
       const noBlur = (e)=>e.preventDefault();
+
+      // importar referencia: o modal tira o foco do editor, entao guardamos o cursor antes
+      const [escolher, setEscolher] = useState(false);
+      const [buscaRef, setBuscaRef] = useState('');
+      const [comFonte, setComFonte] = useState(true);
+      const cursor = useRef(null);
+
+      const guardarCursor = () => {
+        const sel = window.getSelection();
+        cursor.current = (sel && sel.rangeCount && ref.current && ref.current.contains(sel.anchorNode))
+          ? sel.getRangeAt(0).cloneRange() : null;
+      };
+
+      // o insertHTML funde o primeiro bloco com o paragrafo do cursor; um
+      // paragrafo vazio na frente evita o texto grudar no que ja estava escrito
+      const precisaSeparar = () => {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return false;
+        const rg = sel.getRangeAt(0);
+        let n = rg.startContainer;
+        // cursor solto entre os blocos do editor: vale o bloco logo antes dele
+        if (n === ref.current) {
+          const filhos = ref.current.childNodes;
+          const anterior = filhos[Math.min(rg.startOffset, filhos.length) - 1];
+          return !!(anterior && (anterior.textContent||'').trim());
+        }
+        if (n.nodeType === 3) n = n.parentNode;
+        const bloco = n.closest && n.closest('p,h1,h2,h3,h4,li,blockquote');
+        return !!(bloco && ref.current.contains(bloco) && bloco.textContent.trim());
+      };
+
+      const inserir = (r) => {
+        const el = ref.current; if (!el) return;
+        el.focus();
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        if (cursor.current) sel.addRange(cursor.current);
+        else { const fim = document.createRange(); fim.selectNodeContents(el); fim.collapse(false); sel.addRange(fim); }
+        const separador = precisaSeparar() ? '<p><br></p>' : '';
+        document.execCommand('insertHTML', false, separador + htmlDaReferencia(r, comFonte));
+        sync();
+        setEscolher(false); setBuscaRef('');
+      };
+
+      const achados = useMemo(() => {
+        const t = buscaRef.trim().toLowerCase();
+        const comTexto = refs.filter(r => (r.trecho||'').trim());
+        if (!t) return comTexto;
+        return comTexto.filter(r => [r.titulo,r.autor,r.fonte,r.trecho,(r.tags||[]).join(' ')]
+          .filter(Boolean).join(' ').toLowerCase().includes(t));
+      }, [refs, buscaRef]);
+
       return (
         <div>
           <div className="flex flex-wrap gap-1.5 mb-2">
@@ -3027,7 +3089,49 @@ Forma:
             <button type="button" onMouseDown={noBlur} onClick={()=>cmd('formatBlock','<p>')} className={btn} title="Texto normal">Normal</button>
             <button type="button" onMouseDown={noBlur} onClick={()=>cmd('insertUnorderedList')} className={btn} title="Lista">• Lista</button>
             <button type="button" onMouseDown={noBlur} onClick={()=>cmd('removeFormat')} className={btn} title="Limpar formatação">✕ Formato</button>
+            <button type="button" onMouseDown={e=>{ noBlur(e); guardarCursor(); }} onClick={()=>setEscolher(true)}
+              className="px-2.5 py-1 rounded-lg border border-plum-300 text-plum-700 hover:bg-plum-50 transition text-sm" title="Importar o texto de uma referência">
+              📚 Referência
+            </button>
           </div>
+
+          {escolher && (
+            <div className="fixed inset-0 z-50 bg-brand-900/50 backdrop-blur-sm flex items-start justify-center p-4" onClick={()=>setEscolher(false)}>
+              <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full mt-[8vh] overflow-hidden" onClick={e=>e.stopPropagation()} data-anim>
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-brand-200">
+                  <span className="text-brand-400">📚</span>
+                  <input autoFocus value={buscaRef} onChange={e=>setBuscaRef(e.target.value)}
+                    placeholder="Qual referência você quer trazer para o texto?"
+                    className="flex-1 bg-transparent text-sm focus:outline-none text-brand-900" />
+                  <button onClick={()=>setEscolher(false)} className="text-xs text-brand-500 hover:text-brand-900">✕</button>
+                </div>
+                <label className="flex items-center gap-2 px-4 py-2 border-b border-brand-200 text-xs text-brand-600 cursor-pointer">
+                  <input type="checkbox" checked={comFonte} onChange={e=>setComFonte(e.target.checked)} className="accent-plum-600" />
+                  Incluir o título e a fonte antes do texto
+                </label>
+                <div className="max-h-[55vh] overflow-auto pb-2">
+                  {achados.length === 0 ? (
+                    <p className="text-sm text-brand-400 p-6 text-center">
+                      {refs.some(r=>(r.trecho||'').trim())
+                        ? 'Nenhuma referência encontrada.'
+                        : 'Você ainda não tem referências com texto salvo. Use o 🔍 Buscar para trazer um texto da web e salvar em Referências.'}
+                    </p>
+                  ) : achados.map(r => (
+                    <button key={r.id} onClick={()=>inserir(r)}
+                      className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-plum-50 transition flex items-start gap-2.5">
+                      <span>{iconeRef(r.tipo)}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm text-brand-900 truncate">{r.titulo || '(sem título)'}</span>
+                        <span className="block text-xs text-brand-400 truncate">
+                          {[r.autor, (r.trecho||'').trim().split(/\s+/).length + ' palavras'].filter(Boolean).join(' · ')}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="relative">
             {vazio && <div className="absolute left-3 top-3 text-brand-400 pointer-events-none text-[15px]">Escreva aqui. Desenvolva a ideia, o roteiro, o artigo… sem pressa.</div>}
             <div ref={ref} contentEditable suppressContentEditableWarning={true} onInput={sync}
@@ -3037,7 +3141,7 @@ Forma:
         </div>
       );
     }
-    function EscritaTab({ textos = [], setTextos, ideias = [], toast, copiar, onIrIdeia, seed }) {
+    function EscritaTab({ textos = [], setTextos, ideias = [], refs = [], toast, copiar, onIrIdeia, seed }) {
       const [selId, setSelId] = useState(textos[0]?.id || null);
       const [busca, setBusca] = useState('');
 
@@ -3137,7 +3241,7 @@ Forma:
                     {ideiaDoAtual && !textoPuro(atual.corpo) && <button onClick={()=>upd({corpo: '<p>'+montarResumoIdeia(ideiaDoAtual)+'</p>'})} className="text-xs font-semibold text-brand-600 hover:text-brand-800 border border-brand-200 rounded-lg px-2 py-1">Puxar resumo da ideia</button>}
                   </div>
 
-                  <RichEditor value={atual.corpo} onChange={html=>upd({corpo:html})} />
+                  <RichEditor value={atual.corpo} onChange={html=>upd({corpo:html})} refs={refs} />
 
                   <div className="flex flex-wrap items-center justify-between gap-2 mt-3 text-sm">
                     <span className="text-xs text-brand-400">{contarPalavras(textoPuro(atual.corpo))} palavras · salvo automaticamente ✓</span>
@@ -3757,7 +3861,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
             ) : aba==='categorias' ? (
               <CategoriasTab ideias={ideias} onEnviarLivro={setEnviarLivro} onAbrir={irIdeia} />
             ) : aba==='escrita' ? (
-              <EscritaTab textos={textos} setTextos={setTextos} ideias={ideias} toast={toast} copiar={copiar} onIrIdeia={irIdeia} seed={escritaSeed} />
+              <EscritaTab textos={textos} setTextos={setTextos} ideias={ideias} refs={refs} toast={toast} copiar={copiar} onIrIdeia={irIdeia} seed={escritaSeed} />
             ) : aba==='mentor' ? (
               <ChatMentor ideias={ideias} setIdeias={setIdeias} toast={toast} />
             ) : aba==='refs' ? (
