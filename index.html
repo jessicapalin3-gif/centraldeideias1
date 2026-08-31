@@ -1969,9 +1969,211 @@ Forma:
         : p);
     }
 
-    function BuscaGlobal({ ideias, refs, livros, onFechar, onIrIdeia, onIrRef, onIrLivro }) {
+    /* ===== BUSCA NA WEB =================================================
+       Duas fontes, porque uma pagina estatica nao pode "abrir um site"
+       qualquer (o navegador bloqueia por CORS):
+       1) Biblia -> bible-api.com (Almeida). Aberta, sem chave, instantanea.
+       2) Web geral -> Claude com a ferramenta de busca do servidor da
+          Anthropic. Usa a mesma chave ja configurada no Mentor.
+    ==================================================================== */
+
+    const semAcento = (s) => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+
+    // chave normalizada (como a pessoa digita) -> slug aceito pela bible-api
+    const BIBLIA_LIVROS = {
+      'genesis':'genesis','gn':'genesis','gen':'genesis',
+      'exodo':'exodo','ex':'exodo','exo':'exodo',
+      'levitico':'levitico','lv':'levitico','lev':'levitico',
+      'numeros':'numeros','nm':'numeros','num':'numeros',
+      'deuteronomio':'deuteronomio','dt':'deuteronomio','deut':'deuteronomio',
+      'josue':'josue','js':'josue','jos':'josue',
+      'juizes':'jz','jz':'jz','jui':'jz',
+      'rute':'rute','rt':'rute',
+      '1 samuel':'1 samuel','1sm':'1 samuel','1 sm':'1 samuel',
+      '2 samuel':'2 samuel','2sm':'2 samuel','2 sm':'2 samuel',
+      '1 reis':'1 reis','1rs':'1 reis','1 rs':'1 reis',
+      '2 reis':'2 reis','2rs':'2 reis','2 rs':'2 reis',
+      '1 cronicas':'1 cronicas','1cr':'1 cronicas','1 cr':'1 cronicas',
+      '2 cronicas':'2 cronicas','2cr':'2 cronicas','2 cr':'2 cronicas',
+      'esdras':'esdras','ed':'esdras','esd':'esdras',
+      'neemias':'neemias','ne':'neemias','nee':'neemias',
+      'ester':'ester','et':'ester','est':'ester',
+      'jo':'jo','job':'jo',
+      'salmos':'salmos','salmo':'salmos','sl':'salmos','sal':'salmos',
+      'proverbios':'proverbios','pv':'proverbios','prov':'proverbios',
+      'eclesiastes':'eclesiastes','ec':'eclesiastes','ecl':'eclesiastes',
+      'cantares':'cantares','canticos':'cantares','cantico dos canticos':'cantares','ct':'cantares',
+      'isaias':'isaias','is':'isaias',
+      'jeremias':'jeremias','jr':'jeremias','jer':'jeremias',
+      'lamentacoes':'lamentacoes','lm':'lamentacoes','lam':'lamentacoes',
+      'ezequiel':'ezequiel','ez':'ezequiel',
+      'daniel':'daniel','dn':'daniel','dan':'daniel',
+      'oseias':'oseias','os':'oseias',
+      'joel':'joel','jl':'joel',
+      'amos':'amos','am':'amos',
+      'obadias':'obadias','ob':'obadias',
+      'jonas':'jonas','jn':'jonas',
+      'miqueias':'miqueias','mq':'miqueias',
+      'naum':'naum','na':'naum',
+      'habacuque':'habacuque','hc':'habacuque',
+      'sofonias':'sofonias','sf':'sofonias',
+      'ageu':'ageu','ag':'ageu',
+      'zacarias':'zacarias','zc':'zacarias',
+      'malaquias':'malaquias','ml':'malaquias',
+      'mateus':'mateus','mt':'mateus',
+      'marcos':'marcos','mc':'marcos',
+      'lucas':'lucas','lc':'lucas',
+      'joao':'joao','joa':'joao',
+      'atos':'atos','at':'atos',
+      'romanos':'romanos','rm':'romanos','rom':'romanos',
+      '1 corintios':'1 corintios','1co':'1 corintios','1 co':'1 corintios','1cor':'1 corintios',
+      '2 corintios':'2 corintios','2co':'2 corintios','2 co':'2 corintios','2cor':'2 corintios',
+      'galatas':'galatas','gl':'galatas','gal':'galatas',
+      'efesios':'efesios','ef':'efesios',
+      'filipenses':'filipenses','fp':'filipenses','fil':'filipenses',
+      'colossenses':'colossenses','cl':'colossenses','col':'colossenses',
+      '1 tessalonicenses':'1 tessalonicenses','1ts':'1 tessalonicenses','1 ts':'1 tessalonicenses',
+      '2 tessalonicenses':'2 tessalonicenses','2ts':'2 tessalonicenses','2 ts':'2 tessalonicenses',
+      '1 timoteo':'1 timoteo','1tm':'1 timoteo','1 tm':'1 timoteo',
+      '2 timoteo':'2 timoteo','2tm':'2 timoteo','2 tm':'2 timoteo',
+      'tito':'tito','tt':'tito',
+      'filemom':'filemom','filemon':'filemom','fm':'filemom',
+      'hebreus':'hebreus','hb':'hebreus','heb':'hebreus',
+      'tiago':'tiago','tg':'tiago',
+      '1 pedro':'1 pedro','1pe':'1 pedro','1 pe':'1 pedro',
+      '2 pedro':'2 pedro','2pe':'2 pedro','2 pe':'2 pedro',
+      '1 joao':'1 joao','1jo':'1 joao','1 jo':'1 joao',
+      '2 joao':'2 joao','2jo':'2 joao','2 jo':'2 joao',
+      '3 joao':'3 joao','3jo':'3 joao','3 jo':'3 joao',
+      'judas':'judas','jd':'judas',
+      'apocalipse':'apocalipse','ap':'apocalipse','apoc':'apocalipse',
+    };
+    // da chave mais longa para a mais curta, para "1 joao" ganhar de "jo"
+    const BIBLIA_CHAVES = Object.keys(BIBLIA_LIVROS).sort((a,b) => b.length - a.length);
+
+    // "Genesis 24" / "gn 24" / "Joao 3:16" / "Salmos 23.1-6" -> {slug, cap, versos}
+    function detectarRefBiblica(q) {
+      const t = semAcento(q).replace(/\./g, ':').replace(/\s+/g, ' ').trim();
+      for (const chave of BIBLIA_CHAVES) {
+        if (!t.startsWith(chave)) continue;
+        const resto = t.slice(chave.length).trim();
+        const m = resto.match(/^(\d{1,3})(?:\s*:\s*(\d{1,3}(?:\s*-\s*\d{1,3})?))?$/);
+        if (m) return { slug: BIBLIA_LIVROS[chave], cap: m[1], versos: m[2] ? m[2].replace(/\s/g,'') : null };
+      }
+      return null;
+    }
+
+    async function buscarBiblia(det) {
+      const alvo = (det.slug + ' ' + det.cap + (det.versos ? ':' + det.versos : '')).replace(/ /g, '+');
+      const r = await fetch('https://bible-api.com/' + alvo + '?translation=almeida', { cache:'no-store' });
+      const bruto = await r.text();
+      let j;
+      // quando limita o uso, a fonte responde 200 com texto puro, nao JSON
+      try { j = JSON.parse(bruto); }
+      catch (e) {
+        throw new Error(/retry/i.test(bruto)
+          ? 'A fonte da Bíblia está limitando as consultas agora. Tente de novo em alguns segundos.'
+          : 'A fonte da Bíblia respondeu de um jeito inesperado.');
+      }
+      if (j.error || !Array.isArray(j.verses) || !j.verses.length)
+        throw new Error('Não encontrei essa passagem. Confira o nome do livro e o número do capítulo.');
+      return {
+        titulo: j.reference,
+        texto: j.verses.map(v => v.verse + '. ' + (v.text||'').trim()).join('\n'),
+        autor: 'Bíblia Sagrada — João Ferreira de Almeida',
+        fonte: 'bible-api.com',
+        tipo: 'Texto/Documento',
+        tags: ['bíblia'],
+        fontes: [],
+      };
+    }
+
+    const lerCfgIA = () => {
+      try { return Object.assign({usarIA:false, key:'', model:'claude-sonnet-5'}, JSON.parse(localStorage.getItem('central_ideias_chat_cfg_v1'))||{}); }
+      catch (e) { return {usarIA:false, key:'', model:'claude-sonnet-5'}; }
+    };
+
+    // a busca web nova so existe nos modelos recentes; nos demais, cai na basica
+    const BUSCA_WEB_NOVA = /^claude-(fable-5|opus-5|opus-4-8|opus-4-7|opus-4-6|sonnet-5|sonnet-4-6)/;
+
+    async function buscarNaWeb(pergunta, cfg) {
+      const modelo = cfg.model || 'claude-sonnet-5';
+      const tipoFerramenta = BUSCA_WEB_NOVA.test(modelo) ? 'web_search_20260209' : 'web_search_20250305';
+      const sistema = 'Você busca textos na web e devolve o CONTEÚDO pedido, não um resumo. '
+        + 'Se pedirem um capítulo, um poema, um artigo ou um trecho, traga o texto na íntegra, '
+        + 'em português, sem comentários seus antes ou depois. Se o texto for protegido por direitos autorais '
+        + 'e você não puder reproduzi-lo, diga isso em uma linha e traga um resumo fiel com o link da fonte. '
+        + 'Se não encontrar, diga que não encontrou — nunca invente o conteúdo.';
+
+      let msgs = [{ role:'user', content: pergunta }];
+      let texto = '', fontes = [], erroFerramenta = null;
+
+      for (let volta = 0; volta < 3; volta++) {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'content-type':'application/json', 'x-api-key':cfg.key,
+                     'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
+          body: JSON.stringify({
+            model: modelo, max_tokens: 8000, system: sistema,
+            tools: [{ type: tipoFerramenta, name: 'web_search', max_uses: 6 }],
+            messages: msgs,
+          }),
+        });
+        const j = await resp.json().catch(() => null);
+        if (!resp.ok) throw new Error((j && j.error && j.error.message) || ('A busca falhou (erro ' + resp.status + ').'));
+
+        (j.content||[]).forEach(b => {
+          if (b.type === 'text') texto += b.text;
+          if (b.type === 'web_search_tool_result') {
+            // sucesso vem como lista; erro vem como objeto - nao da pra indexar sem checar
+            if (Array.isArray(b.content)) b.content.forEach(r => { if (r.url) fontes.push({ titulo: r.title || r.url, url: r.url }); });
+            else if (b.content && b.content.error_code) erroFerramenta = b.content.error_code;
+          }
+        });
+
+        if (j.stop_reason === 'pause_turn') { msgs = msgs.concat([{ role:'assistant', content: j.content }]); continue; }
+        break;
+      }
+
+      texto = texto.trim();
+      if (!texto) throw new Error(erroFerramenta
+        ? 'A busca na web falhou (' + erroFerramenta + ').'
+        : 'A busca não trouxe nenhum texto.');
+
+      const vistas = new Set();
+      fontes = fontes.filter(f => !vistas.has(f.url) && vistas.add(f.url));
+      return { titulo: pergunta, texto, autor: '', fonte: fontes[0] ? fontes[0].url : 'Busca na web',
+               tipo: 'Site/Página', tags: ['web'], fontes };
+    }
+
+    function BuscaGlobal({ ideias, refs, livros, setRefs, toast, onFechar, onIrIdeia, onIrRef, onIrLivro }) {
       const [q, setQ] = useState('');
       const termo = q.trim().toLowerCase();
+
+      // resultado da busca na web: null | {carregando} | {erro} | {titulo, texto, ...}
+      const [web, setWeb] = useState(null);
+      const cfgIA = useMemo(lerCfgIA, [web===null]);
+      const refBiblica = useMemo(() => detectarRefBiblica(q), [q]);
+      const temChave = !!(cfgIA.key||'').trim();
+
+      useEffect(() => { setWeb(null); }, [q]);
+
+      const rodarBusca = async (fn) => {
+        setWeb({ carregando:true });
+        try { setWeb(await fn()); }
+        catch (e) { setWeb({ erro: e.message || 'Não deu certo.' }); }
+      };
+
+      const salvarComoRef = () => {
+        setRefs(s => [{
+          id: uid(), criadoEm: Date.now(), tipo: web.tipo || 'Site/Página',
+          titulo: web.titulo || q, autor: web.autor || '', ano: '',
+          fonte: web.fonte || '', trecho: web.texto, notas: '',
+          tags: web.tags || [], categoria: '',
+        }, ...s]);
+        toast('Salvo em Referências ✓');
+        onFechar();
+      };
 
       useEffect(() => {
         const onKey = (e) => { if (e.key === 'Escape') onFechar(); };
@@ -1998,22 +2200,89 @@ Forma:
 
       return (
         <div className="fixed inset-0 z-50 bg-brand-900/50 backdrop-blur-sm flex items-start justify-center p-4" onClick={onFechar}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full mt-[8vh] overflow-hidden" onClick={e=>e.stopPropagation()} data-anim>
+          <div className={`bg-white rounded-2xl shadow-2xl w-full mt-[8vh] overflow-hidden transition-[max-width] ${web ? 'max-w-3xl' : 'max-w-xl'}`} onClick={e=>e.stopPropagation()} data-anim>
             <div className="flex items-center gap-2 px-4 py-3 border-b border-brand-200">
               <span className="text-brand-400">🔍</span>
               <input autoFocus value={q} onChange={e=>setQ(e.target.value)}
-                placeholder="Buscar em ideias, referências e livros..."
+                placeholder="Buscar no acervo ou na web (ex.: Gênesis 24)..."
                 className="flex-1 bg-transparent text-sm focus:outline-none text-brand-900" />
               <kbd className="text-[10px] text-brand-400 border border-brand-200 rounded px-1.5 py-0.5">Esc</kbd>
             </div>
 
             <div className="max-h-[60vh] overflow-auto pb-2">
               {!termo ? (
-                <p className="text-sm text-brand-400 p-6 text-center">Digite para buscar em todo o seu acervo.</p>
-              ) : total===0 ? (
-                <p className="text-sm text-brand-400 p-6 text-center">Nada encontrado para “{q}”.</p>
+                <p className="text-sm text-brand-400 p-6 text-center">Digite para buscar no seu acervo — ou na web.</p>
               ) : (
                 <>
+                  {/* ---- WEB ---- */}
+                  <div className={grupoCls}>🌐 Web</div>
+
+                  {!web && (
+                    <div className="px-3 pb-1 space-y-1.5">
+                      {refBiblica && (
+                        <button onClick={()=>rodarBusca(()=>buscarBiblia(refBiblica))}
+                          className="w-full text-left px-3 py-2.5 rounded-xl bg-plum-50 hover:bg-plum-100 transition flex items-start gap-2.5">
+                          <span>📖</span>
+                          <span className="min-w-0">
+                            <span className="block text-sm text-brand-900">Trazer o texto de <strong>{q.trim()}</strong></span>
+                            <span className="block text-xs text-brand-400">Bíblia · Almeida · grátis</span>
+                          </span>
+                        </button>
+                      )}
+                      <button onClick={()=>temChave && rodarBusca(()=>buscarNaWeb(q.trim(), cfgIA))} disabled={!temChave}
+                        className={`w-full text-left px-3 py-2.5 rounded-xl transition flex items-start gap-2.5 ${temChave ? 'hover:bg-plum-50' : 'opacity-60 cursor-not-allowed'}`}>
+                        <span>🌐</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm text-brand-900 truncate">Buscar “{q.trim()}” na web</span>
+                          <span className="block text-xs text-brand-400">
+                            {temChave ? 'Usa sua chave da Anthropic (cobra por uso)' : 'Configure a chave da Anthropic na aba Mentor para ativar'}
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  )}
+
+                  {web && web.carregando && <p className="text-sm text-brand-400 px-3 py-3">Buscando…</p>}
+
+                  {web && web.erro && (
+                    <div className="px-3 py-2">
+                      <p className="text-sm text-brand-600 bg-brand-100 rounded-xl px-3 py-2.5">{web.erro}</p>
+                      <button onClick={()=>setWeb(null)} className="mt-2 text-xs text-plum-600 hover:underline">Tentar de novo</button>
+                    </div>
+                  )}
+
+                  {web && web.texto && (
+                    <div className="px-3 pb-2">
+                      <div className="border border-brand-200 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between gap-2 px-3 py-2 bg-brand-100 border-b border-brand-200">
+                          <span className="text-sm font-semibold text-brand-900 truncate">{web.titulo}</span>
+                          <button onClick={()=>setWeb(null)} className="text-xs text-brand-500 hover:text-brand-900 shrink-0">✕ fechar</button>
+                        </div>
+                        <div className="max-h-[38vh] overflow-auto px-3 py-3">
+                          <p className="text-sm text-brand-800 whitespace-pre-wrap leading-relaxed">{web.texto}</p>
+                          {(web.fontes||[]).length>0 && (
+                            <div className="mt-3 pt-3 border-t border-brand-200">
+                              <p className="text-xs font-semibold text-brand-500 mb-1">Fontes</p>
+                              {web.fontes.slice(0,6).map((f,i) => (
+                                <a key={i} href={f.url} target="_blank" rel="noopener noreferrer"
+                                   className="block text-xs text-plum-600 hover:underline truncate">{f.titulo}</a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2 px-3 py-2 bg-brand-100 border-t border-brand-200">
+                          <button onClick={()=>copiar(web.texto, ()=>toast('Texto copiado ✓'))}
+                            className="px-3 py-1.5 rounded-lg border border-brand-300 text-brand-700 hover:bg-white text-xs transition">Copiar</button>
+                          <button onClick={salvarComoRef}
+                            className="px-3 py-1.5 rounded-lg bg-plum-600 hover:bg-plum-700 text-white text-xs font-medium transition">Salvar em Referências</button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ---- ACERVO ---- */}
+                  {total===0 && <p className="text-sm text-brand-400 px-3 py-4">Nada no seu acervo para “{q}”.</p>}
+
                   {res.ideias.length>0 && <div>
                     <div className={grupoCls}>💡 Ideias</div>
                     {res.ideias.map(i => (
@@ -3597,7 +3866,7 @@ Notas: ${i.notas||'—'}${(i.reflexoes||[]).length ? '\nReflexões:\n'+i.reflexo
 
           {/* BUSCA GLOBAL */}
           {buscaAberta && (
-            <BuscaGlobal ideias={ideias} refs={refs} livros={livros}
+            <BuscaGlobal ideias={ideias} refs={refs} livros={livros} setRefs={setRefs} toast={toast}
               onFechar={()=>setBuscaAberta(false)}
               onIrIdeia={irIdeia} onIrRef={irRef} onIrLivro={irLivro} />
           )}
